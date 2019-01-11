@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package movie;
+
+message Movie {
+  int64 id = 1;
+  string title = 2;
+  string imdb_id = 3;
+  double predicted_rating = 4;
+}
+
+message RecRequest {
+  int64 user_id = 1;
+}
+
+message RecResponse {
+  repeated Movie movies = 1;
+}
+
+service Recommendation {
+  rpc Fetch(RecRequest) returns (RecResponse);
+}
