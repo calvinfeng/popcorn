@@ -14,7 +14,10 @@ function main() {
       return;
     }
 
-    console.log('Movies:', res.getMoviesList());
+    movies = res.getMoviesList();
+    movies.forEach((movie) => {
+      console.log(movie.toObject());
+    });
   });
 }
 
