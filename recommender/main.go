@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net"
 	"os"
 	"popcorn/recommender/pb/movie"
@@ -8,6 +9,8 @@ import (
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 )
+
+const port = 8080
 
 func init() {
 	logrus.SetFormatter(&logrus.TextFormatter{
@@ -17,7 +20,7 @@ func init() {
 }
 
 func main() {
-	lis, err := net.Listen("tcp", ":8080")
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
 	if err != nil {
 		logrus.Error(err)
 		os.Exit(1)
@@ -29,7 +32,7 @@ func main() {
 	movie.RegisterRecommendationServer(srv, &RecommendationService{})
 
 	// Launch server
-	logrus.Info("gRPC server is serving port 8080")
+	logrus.Infof("Golang gRPC server is listening and serving on port %d", port)
 	if err := srv.Serve(lis); err != nil {
 		logrus.Error(err)
 		os.Exit(1)

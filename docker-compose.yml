@@ -1,12 +1,16 @@
 version: '3'
 services:
   frontend:
-    container_name: "api"
+    build: ./api
     image: api
+    container_name: api
     ports:
-      - "8000:8000"
+      - 8000:8000
+    links:
+      - backend
   backend:
-    container_name: "recommender"
+    build: ./recommender
     image: recommender
+    container_name: recommender
     ports:
-      - "8080:8080"
+      - 8080:8080

@@ -31,8 +31,8 @@ function newRecommendationFetchHandler(cli) {
 
 function main() {
   let hostname = 'recommender';
-  if (process.env.HOSTNAME) {
-    hostname = process.env.HOSTNAME
+  if (process.env.BACKEND_HOST) {
+    hostname = process.env.BACKEND_HOST
   }
 
   const client = new services.RecommendationClient(`${hostname}:8080`, grpc.credentials.createInsecure());
@@ -40,7 +40,7 @@ function main() {
   const port = 8000;
 
   app.get('/', newRecommendationFetchHandler(client));
-  app.listen(port, () => console.log(`gRPC client app listening on port ${port}!`))
+  app.listen(port, () => console.log(`Node API server is serving and listening on port ${port}`))
 }
 
 main();
