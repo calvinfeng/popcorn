@@ -30,7 +30,12 @@ function newRecommendationFetchHandler(cli) {
 
 
 function main() {
-  const client = new services.RecommendationClient('localhost:8080', grpc.credentials.createInsecure());
+  let hostname = 'recommender';
+  if (process.env.HOSTNAME) {
+    hostname = process.env.HOSTNAME
+  }
+
+  const client = new services.RecommendationClient(`${hostname}:8080`, grpc.credentials.createInsecure());
   const app = express();
   const port = 8000;
 
