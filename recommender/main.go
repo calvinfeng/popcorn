@@ -17,7 +17,7 @@ func init() {
 }
 
 func main() {
-	lis, err := net.Listen("tcp", ":3000")
+	lis, err := net.Listen("tcp", ":8080")
 	if err != nil {
 		logrus.Error(err)
 		os.Exit(1)
@@ -29,7 +29,7 @@ func main() {
 	movie.RegisterRecommendationServer(srv, &RecommendationService{})
 
 	// Launch server
-	logrus.Info("gRPC server is serving port 3000")
+	logrus.Info("gRPC server is serving port 8080")
 	if err := srv.Serve(lis); err != nil {
 		logrus.Error(err)
 		os.Exit(1)
