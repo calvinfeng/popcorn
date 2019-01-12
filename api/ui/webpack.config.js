@@ -5,8 +5,8 @@ module.exports = {
   devtool: "inline-source-map",
   entry: "./src/app.tsx",
   output: {
-    publicPath: path.join(__dirname, '..', 'api', 'public'),
-    path: path.join(__dirname, '..', 'api', 'public'),
+    publicPath: path.join(__dirname, '..', 'server', 'public'),
+    path: path.join(__dirname, '..', 'server', 'public'),
     filename: "index.js",
   },
   resolve: {

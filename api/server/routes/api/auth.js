@@ -1,7 +1,8 @@
 const router = require('express').Router();
 const {OAuth2Client} = require('google-auth-library');
 
-const CLIENT_ID = '554659982367-k2ijq5aqf1pnqhat0scq918akbtoib7a.apps.googleusercontent.com';
+// OAuth Client ID
+const CLIENT_ID = '159011759683-01llm5cirgtboge88g73342bl9nn1ihb.apps.googleusercontent.com';
 
 async function verify(token) {
   const client = new OAuth2Client(CLIENT_ID);
@@ -13,17 +14,22 @@ async function verify(token) {
   return ticket.getPayload();;
 }
 
-router.get('/:token', (req, res) => {
-  verify(req.params.token).then((user) => {
+router.get('/', (req, res) => {
+  if (!req.get('token')) {
+    res.status(400);
+    res.send({
+      "message": "token is not found in header"
+    });
+    return;
+  }
+
+  verify(req.get('token')).then((user) => {
     res.status(200);
     res.send({
       "status": 200,
-      "email": user.email,
-      "name": user.name,
-      "message": `Welcome to Popcorn, ${user.given_name}`
+      "message": `Welcome to Popcorn, ${user.name}`
     });
   }).catch((err) => {
-    console.error(err);
     res.status(400);
     res.send({
       "status": 400,

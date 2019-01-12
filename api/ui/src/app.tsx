@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
 import { GoogleLogin, GoogleLoginResponse } from 'react-google-login'
-import axios from 'axios'
+import axios, { AxiosResponse, AxiosError } from 'axios'
 
 // OAuth Client ID
 const CLIENT_ID = '159011759683-01llm5cirgtboge88g73342bl9nn1ihb.apps.googleusercontent.com'
@@ -36,11 +36,17 @@ class App extends React.Component<Props, State> {
     })
 
     const auth = res.getAuthResponse()
-    console.log(auth.id_token)
+    axios.get("api/auth", {
+      headers: {"token": auth.id_token}
+    }).then((res: AxiosResponse) => {
+      console.log(res.data);
+    }).catch((err: AxiosError) => {
+      console.error(err);
+    })
   }
 
   handleLoginError = (err: any) => {
-    console.log(err)
+    console.error(err)
   }
 
   render() {

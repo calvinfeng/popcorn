@@ -1,6 +1,6 @@
 const router = require('express').Router();
 
 router.use('/recommendations', require('./recommendation'));
-router.use('/authentication', require('./authentication'));
+router.use('/auth', require('./auth'));
 
 module.exports = router;
