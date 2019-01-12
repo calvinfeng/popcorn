@@ -4,6 +4,8 @@ Officially developing Popcorn 2.0.
 
 ## Architecture
 
+Docker, Golang, TypeScript, Node.js, PostgreSQL
+
 ### Requirements
 
 - Golang 1.11+
