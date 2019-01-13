@@ -50,6 +50,10 @@ class App extends React.Component<Props, State> {
   }
 
   render() {
+    const login = <GoogleLogin clientId={CLIENT_ID} buttonText="Login" 
+      onSuccess={this.handleLoginSuccess} 
+      onFailure={this.handleLoginError} />;
+
     if (this.state.authenticated) {
       return <section>
         <h2>Welcome, {this.state.name}</h2>
@@ -58,9 +62,11 @@ class App extends React.Component<Props, State> {
       </section>
     }
 
-    return <GoogleLogin clientId={CLIENT_ID} buttonText="Login" 
-      onSuccess={this.handleLoginSuccess} 
-      onFailure={this.handleLoginError} />
+    return <section>
+      <h1>Hello World</h1>
+      <h3>This is PWA</h3>
+      {login}
+    </section>
   }
 }
 

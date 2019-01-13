@@ -7,7 +7,8 @@
     "postinstall": "webpack",
     "prestart": "webpack",
     "build": "webpack",
-    "build:watch": "webpack --watch"
+    "build:watch": "webpack --watch",
+    "min": "uglifyjs -o ../server/public/index.js ../server/public/bundle.js"
   },
   "keywords": [],
   "author": "",
@@ -23,6 +24,8 @@
     "style-loader": "^0.23.1",
     "ts-loader": "^5.3.3",
     "typescript": "^3.2.2",
+    "uglify-es": "^3.3.9",
+    "uglify-js": "^3.4.9",
     "webpack": "^4.28.4",
     "webpack-cli": "^3.2.1",
     "webpack-dev-server": "^3.1.14"
