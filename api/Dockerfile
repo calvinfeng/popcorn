@@ -12,6 +12,6 @@ WORKDIR /api/server
 RUN npm install
 
 ENV BACKEND_HOST=backend
-EXPOSE 8000
+EXPOSE 8080
 
 CMD node app.js
