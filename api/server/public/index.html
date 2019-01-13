@@ -10,7 +10,7 @@
     <title>Popcorn</title>
   </head>
   <script>
-    if ('serviceWorker' in navigator) {
+    if ('serviceWorker' in navigator && window.location.hostname !== 'localhost') {
       window.addEventListener('load', function() {
         navigator.serviceWorker.register('service-worker.js').then(function(registration) {
           // Registration was successful
@@ -23,7 +23,7 @@
         });
       });
     } else {
-      console.log('service worker is not supported');
+      console.log('service worker is disabled');
     }
   </script>
   <body>

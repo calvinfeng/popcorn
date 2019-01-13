@@ -2,8 +2,8 @@ const router = require('express').Router();
 const messages = require('../../pb/movie/movie_pb');
 
 router.get('/:user', (req, res) => {
-  const cli = req.grpc_client;
-
+  const cli = res.locals.grpc_client;
+  res.locals.log.info('you are hitting the recommendation endpoints');
   if (cli === undefined) {
     res.status(500);
     res.send('server failed to define gRPC client');

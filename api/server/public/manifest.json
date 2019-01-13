@@ -1,6 +1,7 @@
 {
   "short_name": "Popcorn",
-  "name": "Popcorn the Movie Recommender",
+  "name": "Popcorn",
+  "description": "a movie recommendation application",
   "icons": [
     {
       "src":"icon.png",
@@ -11,5 +12,6 @@
   "start_url": "./",
   "display": "standalone",
   "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "background_color": "#A52A2A",
+  "orientation": "portrait-primary"
 }

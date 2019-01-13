@@ -17,32 +17,37 @@ function newGRPCMiddleware() {
   const cli = new services.RecommendationClient(gRPCaddress, grpc.credentials.createInsecure());
   
   return (req, res, next) => {
-    // Ghetto way of setting context for a request
-    req.grpc_client = cli;
+    res.locals.grpc_client = cli;
     next();
   }
 }
 
-function newLogger() {
+function newLogMiddleware(log) {
+  return (req, res, next) => {
+    res.locals.log = log;
+    next();
+  }
+}
+
+function main() {
+  const app = express(); 
+ 
+  const port = 8080;
+  
+  // Configure a logger that we will use throughout the application.
   const myFormat = printf(info => (
     `${info.timestamp} [${info.label}] ${info.level}: ${info.message}`
   ));
 
-  return createLogger({
+  const log = createLogger({
     level: 'info',
     format: combine(label({ label: 'api'}), timestamp(), myFormat),
     transports: [
       new transports.Console({colorize: true})
     ]
   });
-}
 
-function main() {
-  let port = 8080;
-  const log = newLogger();
-  const app = express(); 
-  
-  // Use redirect to HTTPS logic if the current environment is GCP
+  // Use redirect to HTTPS logic if the current environment is GCP (Google Cloud Platform.)
   if (process.env.GCP) {
     app.all('/', (req, res, next) => {
       if (req.get('X-Forwarded-Proto') === 'https') {
@@ -54,7 +59,7 @@ function main() {
   }
 
   app.use(morgan(':date[iso] :http-version :method :url => :response-time ms'));
-  app.use(newGRPCMiddleware(), require('./routes'));
+  app.use(newLogMiddleware(log), newGRPCMiddleware(), require('./routes'));
   app.use(express.static('public'));
   app.listen(port, () => {
     log.info(`Node API server is serving and listening on port ${port}`)
