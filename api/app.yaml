@@ -1,0 +1,7 @@
+service: api
+runtime: custom
+env: flex
+automatic_scaling:
+  min_num_instances: 1
+env_variables:
+  GCP: true

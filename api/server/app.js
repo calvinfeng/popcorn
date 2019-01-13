@@ -16,11 +16,22 @@ function main() {
   }
 
   // TODO: Move gRPC client into respective route.
-  const address = `${hostname}:8080`;
+  const address = `${hostname}:8081`;
   const client = new services.RecommendationClient(address, grpc.credentials.createInsecure());
   const app = express(); 
-  const port = 8000;
- 
+  const port = 8080;
+  
+  // Use redirect to HTTPS logic if the current environment is GCP
+  if (process.env.GCP) {
+    app.all('/', (req, res, next) => {
+      if (req.get('X-Forwarded-Proto') === 'https') {
+        next();
+      } else {
+        res.redirect('https://' + req.headers.host + req.url);
+      }
+    });
+  }
+
   app.use(newGRPCMiddleware(client), require('./routes'));
   app.use(express.static('public'));
   app.listen(port, () => {

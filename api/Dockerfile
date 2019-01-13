@@ -6,6 +6,7 @@ COPY . /api
 WORKDIR /api/ui
 RUN npm install
 RUN npm run build
+RUN npm run min
 
 WORKDIR /api/server
 RUN npm install
