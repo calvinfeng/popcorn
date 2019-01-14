@@ -6,6 +6,7 @@ const { createLogger, format, transports } = require('winston');
 const { combine, timestamp, label, printf } = format;
 
 const express = require('express');
+const userAuthentication = require('./middleware/auth');
 
 function newGRPCMiddleware() {
   let hostname = 'localhost';
@@ -38,7 +39,7 @@ function newLogger() {
 }
 
 function main() {
-  let port = 8080;
+  let port = 8000;
   const log = newLogger();
   const app = express(); 
   
@@ -54,6 +55,7 @@ function main() {
   }
 
   app.use(morgan(':date[iso] :http-version :method :url => :response-time ms'));
+  app.use('/api', userAuthentication);
   app.use(newGRPCMiddleware(), require('./routes'));
   app.use(express.static('public'));
   app.listen(port, () => {
