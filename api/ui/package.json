@@ -8,7 +8,7 @@
     "prestart": "webpack",
     "build": "webpack",
     "build:watch": "webpack --watch",
-    "min": "uglifyjs -o ../server/public/index.js ../server/public/bundle.js"
+    "min": "uglifyjs -o ../server/public/index.js ../server/public/index.js"
   },
   "keywords": [],
   "author": "",

@@ -76,34 +76,49 @@ class App extends React.Component<Props, State> {
 
   get header() {
     let button: JSX.Element;
+    let img: JSX.Element;
     if (this.state.authenticated) {
       button = <GoogleLogout buttonText="Logout" onLogoutSuccess={this.handleLogoutSuccess} />
+      img = <img src={this.state.imageUrl} height="43" width="43" />
+
     } else {
       button = <GoogleLogin clientId={CLIENT_ID}
         buttonText="Login" onSuccess={this.handleLoginSuccess} onFailure={this.handleLoginError} /> 
+      img = <div />
     }
 
     return (
       <section className="header">
-        {button}
+        <div className="left-box">
+          {img}
+        </div>
+        <div className="right-box">
+          {button}
+        </div>
       </section>
     )
   }
 
   get content() {
     if (this.state.authenticated) {
-      return (
-        <section className="content">
+      const greeting = (
+        <section className="greeting">
           <h2>Welcome, {this.state.name}</h2>
-          <h4>{this.state.email}</h4>
-          <img src={this.state.imageUrl} />
+          <p>{this.state.email}</p>
+        </section>
+      )
+
+      return (
+        <section className="real-content">
+          {greeting}
           <Camera />
         </section>
       )
     }
 
     return (
-      <section className="content">
+      <section className="landing-content">
+        <img src="/android-chrome-512x512.png"></img>
         <p>Login to find out what movie we recommend!</p>
       </section>
     )
@@ -111,7 +126,7 @@ class App extends React.Component<Props, State> {
 
   render() {
     return (
-      <section id="popcorn">
+      <section className="popcorn">
         {this.header}
         {this.content}
       </section>
