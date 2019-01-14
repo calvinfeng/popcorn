@@ -36,7 +36,7 @@ class App extends React.Component<Props, State> {
     })
 
     const auth = res.getAuthResponse()
-    axios.get("api/auth", {
+    axios.get("main", {
       headers: {"token": auth.id_token}
     }).then((res: AxiosResponse) => {
       console.log(res.data);
