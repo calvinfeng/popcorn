@@ -43,12 +43,13 @@ body {
     .landing-content {
       width: 100%;
       max-width: 1024px;
+      display: inherit;
+      flex-direction: column;
       p {
         color: white;
         text-align: center;
       }
       img {
-        position: static;
         width: 100%;
         margin-top: 5rem;
       }
@@ -57,7 +58,8 @@ body {
     .real-content {
       width: 100%;
       max-width: 1024px;
-
+      display: inherit;
+      flex-direction: column;
       .greeting {
         color: white;
       }
