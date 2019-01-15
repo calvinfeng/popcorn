@@ -9,12 +9,20 @@ const express = require('express');
 const userAuthentication = require('./middleware/auth');
 
 function newGRPCMiddleware() {
-  let hostname = 'localhost';
-  if (process.env.BACKEND_HOST) {
-    hostname = process.env.BACKEND_HOST
+  let gRPCaddress = 'localhost:8081';
+
+  // Check if we are running in a dockerized environment.
+  // Use port 8081 locally.
+  if (process.env.GRPC_HOSTNAME) {
+    gRPCaddress = `${process.env.GRPC_HOSTNAME}:8081`;
   }
 
-  const gRPCaddress = `${hostname}:8081`;
+  // Check if we are on Google cloud platform.
+  // Use port 80 for deployment.
+  if (process.env.GCP) {
+    gRPCaddress = `${process.env.GPC_GRPC_HOSTNAME}:80`;
+  }
+
   const cli = new services.RecommendationClient(gRPCaddress, grpc.credentials.createInsecure());
   
   return (req, res, next) => {
@@ -33,7 +41,10 @@ function newLogMiddleware(log) {
 function main() {
   const app = express(); 
  
-  const port = 8080;
+  let port = "8080";
+  if (process.env.PORT) {
+    port = process.env.PORT;
+  }
   
   // Configure a logger that we will use throughout the application.
   const myFormat = printf(info => (
@@ -60,9 +71,10 @@ function main() {
   }
 
   app.use(morgan(':date[iso] :http-version :method :url => :response-time ms'));
+  app.use(express.static('public'));
+  
   app.use('/api', userAuthentication);
   app.use(newLogMiddleware(log), newGRPCMiddleware(), require('./routes'));
-  app.use(express.static('public'));
   app.listen(port, () => {
     log.info(`Node API server is serving and listening on port ${port}`)
   })

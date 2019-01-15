@@ -13,9 +13,7 @@ async function verify(token) {
   return ticket.getPayload();;
 }
 
-function userAuthentication(req, res, next) {
-  console.log('Authenticating user...')
-  
+function userAuthentication(req, res, next) {  
   if (!req.get('token')) {
     res.status(400);
     res.send({

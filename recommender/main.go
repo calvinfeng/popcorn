@@ -6,11 +6,17 @@ import (
 	"os"
 	"popcorn/recommender/pb/movie"
 
+	"github.com/caarlos0/env"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 )
 
-const port = 8081
+// EnvConfig specifies environmental variable
+type EnvConfig struct {
+	GCP         bool `env:"GCP"          envDefault:"false"`
+	DefaultPort int  `env:"DEFAULT_PORT" envDefault:"8081"`
+	GCPPort     int  `env:"GCP_PORT"     envDefault:"8080"`
+}
 
 func init() {
 	logrus.SetFormatter(&logrus.TextFormatter{
@@ -20,6 +26,18 @@ func init() {
 }
 
 func main() {
+	cfg := EnvConfig{}
+	err := env.Parse(&cfg)
+	if err != nil {
+		logrus.Error(err)
+		os.Exit(1)
+	}
+
+	port := cfg.DefaultPort
+	if cfg.GCP {
+		port = cfg.GCPPort
+	}
+
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
 	if err != nil {
 		logrus.Error(err)

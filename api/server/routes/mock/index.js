@@ -1,5 +1,5 @@
 const router = require('express').Router();
 
-router.use('/recommend', require('./recommend'));
+router.use('/grpc', require('./grpc'));
 
 module.exports = router;
