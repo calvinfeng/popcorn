@@ -1,0 +1,20 @@
+#popcorn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  font-family: Roboto;
+  
+  .header {
+    width: 100%;
+    display: inherit;
+    flex-direction: row;
+    justify-content: flex-end;
+    background: transparent;
+  }
+
+  .content {
+    width: 100%;
+    max-width: 1024px;
+  }
+}
