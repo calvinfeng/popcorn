@@ -1,7 +1,7 @@
 const {OAuth2Client} = require('google-auth-library');
 
 // OAuth Client ID
-const CLIENT_ID = '159011759683-01llm5cirgtboge88g73342bl9nn1ihb.apps.googleusercontent.com';
+const CLIENT_ID = '1098793859190-mg296rsi3udk6il3qttma3ub9k6dp49b.apps.googleusercontent.com';
 
 async function verify(token) {
   const client = new OAuth2Client(CLIENT_ID);

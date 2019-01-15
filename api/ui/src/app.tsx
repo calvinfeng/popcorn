@@ -8,7 +8,7 @@ import { configureInterceptor, setUserStateToCookie, getUserStateFromCookie } fr
 import Camera from './ components/camera'
 
 // OAuth Client ID
-const CLIENT_ID = '159011759683-01llm5cirgtboge88g73342bl9nn1ihb.apps.googleusercontent.com'
+const CLIENT_ID = '1098793859190-mg296rsi3udk6il3qttma3ub9k6dp49b.apps.googleusercontent.com';
 
 interface State {
   email: string
