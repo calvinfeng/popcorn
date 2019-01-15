@@ -1,0 +1,79 @@
+body {
+  margin: 0;
+  width: 100vw;
+  height: 100vh;
+}
+
+#app {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  background: #000000d6;
+  justify-content: center;
+  
+  .popcorn {
+    width: 96%;
+    display: inherit;
+    flex-direction: column;
+    align-items: center;
+    font-family: Roboto;
+    margin: 0.5rem;
+
+    .header {
+      width: 100%;
+      height: 8%;
+      display: inherit;
+      flex-direction: row;
+      background: transparent;
+      align-items: center;
+      overflow: hidden;
+
+      .left-box {
+        width: 50%;
+        display: inherit;
+        flex-direction: row;
+        justify-content: flex-start;
+      }
+  
+      .right-box {
+        width: 50%;
+        display: inherit;
+        flex-direction: row;
+        justify-content: flex-end;
+      }
+    }
+  
+    .landing-content {
+      width: 100%;
+      max-width: 1024px;
+      display: inherit;
+      flex-direction: column;
+      position: relative;
+      top: 10%;
+      p {
+        color: white;
+        text-align: center;
+      }
+      img {
+        width: 100%;
+        margin-top: 5rem;
+      }
+    }
+
+    .real-content {
+      width: 100%;
+      max-width: 1024px;
+      display: inherit;
+      flex-direction: column;
+      .greeting {
+        color: white;
+      }
+
+      .camera {
+        p {
+          color: white;
+        }
+      }
+    }
+  }
+}
