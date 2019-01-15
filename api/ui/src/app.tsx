@@ -7,8 +7,8 @@ import "./app.scss"
 import { configureInterceptor, setUserStateToCookie, getUserStateFromCookie } from './util'
 import Camera from './ components/camera'
 
-// OAuth Client ID
-const CLIENT_ID = '1098793859190-mg296rsi3udk6il3qttma3ub9k6dp49b.apps.googleusercontent.com';
+// OAuth Web Client ID
+const WEB_CLIENT_ID = '1098793859190-nrralnk204e67g7seeok729qrt0jhd32.apps.googleusercontent.com';
 
 interface State {
   email: string
@@ -82,7 +82,7 @@ class App extends React.Component<Props, State> {
       img = <img src={this.state.imageUrl} height="43" width="43" />
 
     } else {
-      button = <GoogleLogin clientId={CLIENT_ID}
+      button = <GoogleLogin clientId={WEB_CLIENT_ID}
         buttonText="Login" onSuccess={this.handleLoginSuccess} onFailure={this.handleLoginError} /> 
       img = <div />
     }
