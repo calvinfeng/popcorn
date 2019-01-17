@@ -5,11 +5,12 @@ COPY . /go/src/recommender
 WORKDIR /go/src/recommender
 
 ENV GO111MODULE=on
+ENV DOCKER=true
 
 EXPOSE 8080
 EXPOSE 8081
 
 RUN go install
-RUN recommender migrate
+RUN recommender migrate up
 
 CMD recommender serve
