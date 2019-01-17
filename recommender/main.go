@@ -32,6 +32,11 @@ func main() {
 			Use:   "migrate",
 			RunE:  cmd.Migrate,
 		},
+		&cobra.Command{
+			Short: "Run an example query",
+			Use:   "query",
+			RunE:  cmd.Query,
+		},
 	)
 
 	if err := root.Execute(); err != nil {

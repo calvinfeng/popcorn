@@ -23,10 +23,14 @@ CREATE INDEX ON movies(cluster);
 
 CREATE TABLE movie_details (
     imdb_id VARCHAR(512) PRIMARY KEY,
+    created_at TIMESTAMP WITH TIME ZONE,
+    updated_at TIMESTAMP WITH TIME ZONE,
     detail BYTEA
 );
 
 CREATE TABLE movie_trailers (
     imdb_id VARCHAR(512) PRIMARY KEY,
+    created_at TIMESTAMP WITH TIME ZONE,
+    updated_at TIMESTAMP WITH TIME ZONE,
     trailer BYTEA
 );

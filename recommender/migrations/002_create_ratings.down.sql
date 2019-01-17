@@ -1,2 +1,2 @@
 DROP TABLE IF EXISTS ratings;
-
+DROP TABLE IF EXISTS preferences;
