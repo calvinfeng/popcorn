@@ -10,29 +10,41 @@ import (
 	"github.com/caarlos0/env"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"google.golang.org/grpc"
 )
 
-// EnvConfig specifies environmental variable
+// EnvConfig captures environmental variable
 type EnvConfig struct {
-	GCP         bool `env:"GCP"          envDefault:"false"`
-	DefaultPort int  `env:"DEFAULT_PORT" envDefault:"8081"`
-	GCPPort     int  `env:"GCP_PORT"     envDefault:"8080"`
+	GCP bool `env:"GCP" envDefault:"false"`
 }
 
-// Serve accepts incoming gRPC requests and handle them with registered services.
-func Serve(cmd *cobra.Command, args []string) error {
+func init() {
+	viper.AddConfigPath("./conf")
+}
+
+func configureViper() error {
 	cfg := EnvConfig{}
 	if err := env.Parse(&cfg); err != nil {
 		return err
 	}
 
-	port := cfg.DefaultPort
 	if cfg.GCP {
-		port = cfg.GCPPort
+		viper.SetConfigName("production")
+	} else {
+		viper.SetConfigName("development")
 	}
 
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
+	return viper.ReadInConfig()
+}
+
+// Serve accepts incoming gRPC requests and handle them with registered services.
+func Serve(cmd *cobra.Command, args []string) error {
+	if err := configureViper(); err != nil {
+		return err
+	}
+
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", viper.GetInt("grpc.port")))
 	if err != nil {
 		logrus.Error(err)
 		os.Exit(1)
@@ -41,6 +53,6 @@ func Serve(cmd *cobra.Command, args []string) error {
 	srv := grpc.NewServer()
 	movie.RegisterRecommendationServer(srv, &rec.Server{})
 
-	logrus.Infof("recommender is listening and serving on port %d", port)
+	logrus.Infof("recommender is listening and serving on port %d", viper.GetInt("grpc.port"))
 	return srv.Serve(lis)
 }

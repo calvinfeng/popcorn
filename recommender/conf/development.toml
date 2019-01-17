@@ -1,0 +1,10 @@
+[grpc]
+port = "8081"
+
+[database]
+name = "popcorn"
+user = "cfeng"
+password = "cfeng"
+hostname = "localhost"
+port = 5432
+ssl_mode = "disable"
