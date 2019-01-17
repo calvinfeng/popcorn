@@ -13,5 +13,6 @@ EXPOSE 8080
 EXPOSE 8081
 
 RUN go install
+RUN recommender migrate
 
-CMD recommender
+CMD recommender serve

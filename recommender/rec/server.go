@@ -1,18 +1,17 @@
-package main
+package rec
 
 import (
 	"context"
-
 	"popcorn/recommender/pb/movie"
 
 	"github.com/sirupsen/logrus"
 )
 
-// RecommendationService is a gRPC service.
-type RecommendationService struct{}
+// Server provides gRPC service.
+type Server struct{}
 
 // Fetch returns a list of recommended movies.
-func (srv *RecommendationService) Fetch(ctx context.Context, req *movie.RecRequest) (*movie.RecResponse, error) {
+func (srv *Server) Fetch(ctx context.Context, req *movie.RecRequest) (*movie.RecResponse, error) {
 	logrus.Infof("server received request to fetch movie for user %d", req.UserId)
 
 	movies := []*movie.Movie{
