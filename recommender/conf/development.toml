@@ -3,8 +3,8 @@ port = "8081"
 
 [database]
 name = "popcorn"
-user = "cfeng"
-password = "cfeng"
+user = "popcorn"
+password = "popcorn"
 hostname = "localhost"
 port = 5432
 ssl_mode = "disable"
