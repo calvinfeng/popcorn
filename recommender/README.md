@@ -2,8 +2,8 @@
 
 ## Docker
 
-    docker build -t recommender .
-    docker run -p 8081:8081 recommender
+    docker build -t recommender . --network=host
+    docker run -p 8081:8081 recommender --network=host
 
 If you use `-P` to publish all exposed ports, they will get mapped to random port numbers. I
 recommend using `-p <exposed>:<publish_to>` to specify the desired port to publish to.
@@ -26,3 +26,21 @@ Create a database
 ```sql
 CREATE DATABASE popcorn with OWNER=popcorn;
 ```
+
+## Available Commands
+
+### Run server
+
+    recommender serve
+
+### Run migration
+
+    recommender migrate up
+
+### Reset database
+
+    recommender migrate reset
+
+### Seed
+
+    recommender seed

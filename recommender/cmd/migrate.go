@@ -47,8 +47,6 @@ func Migrate(cmd *cobra.Command, args []string) error {
 		viper.GetString("database.ssl_mode"),
 	)
 
-	logrus.Infof("performing migration on database %s", addr)
-
 	migration, err := migrate.New(dir, addr)
 	if err != nil {
 		return err
@@ -56,10 +54,23 @@ func Migrate(cmd *cobra.Command, args []string) error {
 
 	switch args[0] {
 	case up:
-		return migration.Up()
+		logrus.Infof("migrating database %s to latest version", addr)
+		err = migration.Up()
 	case reset:
-		return migration.Drop()
+		logrus.Warnf("resetting database %s, all data will be lost", addr)
+		err = migration.Drop()
 	default:
 		return fmt.Errorf("%s is not a valid command", args[0])
 	}
+
+	if err != nil {
+		switch err {
+		case migrate.ErrNoChange:
+			logrus.Warn(err)
+		default:
+			return err
+		}
+	}
+
+	return nil
 }

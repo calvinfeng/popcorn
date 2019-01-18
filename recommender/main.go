@@ -37,6 +37,11 @@ func main() {
 			Use:   "query",
 			RunE:  cmd.Query,
 		},
+		&cobra.Command{
+			Short: "Seed the database with some mock data",
+			Use:   "seed",
+			RunE:  cmd.Seed,
+		},
 	)
 
 	if err := root.Execute(); err != nil {

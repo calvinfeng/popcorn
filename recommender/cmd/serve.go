@@ -32,8 +32,6 @@ func configureViper() error {
 
 	if cfg.GCP {
 		viper.SetConfigName("production")
-	} else if cfg.Docker {
-		viper.SetConfigName("docker")
 	} else {
 		viper.SetConfigName("development")
 	}
