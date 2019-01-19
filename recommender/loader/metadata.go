@@ -1,4 +1,4 @@
-package seeder
+package loader
 
 import (
 	"bufio"
@@ -9,7 +9,7 @@ import (
 	"strconv"
 )
 
-// LoadMetadata grabs IMDB and TMDB IDs from CSV and load them into movies.
+// LoadMetadata grabs IMDB and TMDB IDs from CSV and load them into movies in memory.
 func LoadMetadata() error {
 	csvFile, err := os.Open(fmt.Sprintf("%s/links.csv", dataDir))
 	if err != nil {
@@ -30,12 +30,12 @@ func LoadMetadata() error {
 			continue
 		}
 
-		if _, ok := movies[uint(id)]; !ok {
+		if _, ok := movies[movieID(id)]; !ok {
 			continue
 		}
 
-		movies[uint(id)].IMDBID = "tt" + row[1]
-		movies[uint(id)].TMDBID = row[2]
+		movies[movieID(id)].IMDBID = "tt" + row[1]
+		movies[movieID(id)].TMDBID = row[2]
 	}
 
 	return nil
@@ -62,15 +62,15 @@ func LoadTags() error {
 			continue
 		}
 
-		if _, ok := movies[uint(id)]; !ok {
+		if _, ok := movies[movieID(id)]; !ok {
 			continue
 		}
 
-		if movies[uint(id)].Tags == nil {
-			movies[uint(id)].Tags = []string{}
+		if movies[movieID(id)].Tags == nil {
+			movies[movieID(id)].Tags = []string{}
 		}
 
-		movies[uint(id)].Tags = append(movies[uint(id)].Tags, row[2])
+		movies[movieID(id)].Tags = append(movies[movieID(id)].Tags, row[2])
 	}
 
 	return nil

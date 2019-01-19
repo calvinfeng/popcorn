@@ -2,10 +2,11 @@ package cmd
 
 import (
 	"fmt"
-	"popcorn/recommender/seeder"
+	"popcorn/recommender/loader"
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres" // Postgres Driver
+	"github.com/schollz/progressbar"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -33,29 +34,39 @@ func Seed(cmd *cobra.Command, args []string) error {
 
 	logrus.Infof("connected to %s", addr)
 
-	seeder.SetDatasetDir("./datasets/100k")
-	if err := seeder.LoadMovies(); err != nil {
+	loader.SetDatasetDir("./datasets/100k")
+	if err := loader.LoadMovies(); err != nil {
 		return err
 	}
 
-	if err := seeder.LoadMetadata(); err != nil {
+	if err := loader.LoadMetadata(); err != nil {
 		return err
 	}
 
-	if err := seeder.LoadTags(); err != nil {
+	if err := loader.LoadTags(); err != nil {
 		return err
 	}
+
+	if err := loader.LoadRatings(); err != nil {
+		return err
+	}
+
+	loader.AddRatingStatsToMovies()
+
+	movies := loader.Movies()
+	bar := progressbar.New(len(movies))
 
 	var count int
-	for _, movie := range seeder.GetMovies() {
+	for _, movie := range loader.Movies() {
 		if err := db.Create(movie).Error; err != nil {
 			logrus.Error(err)
 		} else {
-			logrus.Infof("movie %d is inserted", movie.ID)
+			bar.Add(1)
 			count++
 		}
 	}
 
+	fmt.Println()
 	logrus.Infof("inserted %d movies to database", count)
 
 	return nil
