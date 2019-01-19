@@ -1,9 +1,8 @@
 package cmd
 
 import (
-	"encoding/json"
 	"fmt"
-	"popcorn/recommender/model"
+	"popcorn/recommender/seeder"
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres" // Postgres Driver
@@ -32,16 +31,32 @@ func Seed(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	for i := 0; i < 10; i++ {
-		detail := &model.MovieDetail{
-			IMDBID: fmt.Sprintf("tttt011470%d", i),
-			Detail: json.RawMessage(`{foo: "bar"}`),
-		}
+	logrus.Infof("connected to %s", addr)
 
-		if err := db.Create(detail).Error; err != nil {
+	seeder.SetDatasetDir("./datasets/100k")
+	if err := seeder.LoadMovies(); err != nil {
+		return err
+	}
+
+	if err := seeder.LoadMetadata(); err != nil {
+		return err
+	}
+
+	if err := seeder.LoadTags(); err != nil {
+		return err
+	}
+
+	var count int
+	for _, movie := range seeder.GetMovies() {
+		if err := db.Create(movie).Error; err != nil {
 			logrus.Error(err)
+		} else {
+			logrus.Infof("movie %d is inserted", movie.ID)
+			count++
 		}
 	}
+
+	logrus.Infof("inserted %d movies to database", count)
 
 	return nil
 }

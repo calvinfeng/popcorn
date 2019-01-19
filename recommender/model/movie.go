@@ -22,6 +22,7 @@ type Movie struct {
 
 	// Feature is k-dimensional vector that represents the latent feature of a movie.
 	Feature pq.Float64Array `gorm:"column:feature"`
+	Tags    pq.StringArray  `gorm:"column:tags"`
 
 	Cluster          int64         `gorm:"column:cluster"`
 	NearestClusters  pq.Int64Array `gorm:"column:nearest_clusters"`

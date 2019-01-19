@@ -44,3 +44,12 @@ CREATE DATABASE popcorn with OWNER=popcorn;
 ### Seed
 
     recommender seed
+
+## Datasets
+
+In order for seeding to work, download the data from movies lens using the following command.
+
+    cd popcorn/recommender/datasets
+    curl http://files.grouplens.org/datasets/movielens/ml-latest-small.zip
+
+And then unzip it into your `datasets/` directory.

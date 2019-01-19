@@ -1,5 +1,5 @@
 CREATE TABLE movies (
-    id SERIAL PRIMARY KEY,
+    id INTEGER PRIMARY KEY,
     created_at TIMESTAMP WITH TIME ZONE,
     updated_at TIMESTAMP WITH TIME ZONE,
     deleted_at TIMESTAMP WITH TIME ZONE,
@@ -10,6 +10,7 @@ CREATE TABLE movies (
     num_rating INTEGER,
     imdb_rating REAL,
     average_rating REAL,
+    tags VARCHAR(128)[],
     feature DOUBLE PRECISION[],
     cluster SMALLINT,
     nearest_clusters SMALLINT[],
@@ -19,7 +20,6 @@ CREATE TABLE movies (
 CREATE INDEX ON movies(title);
 CREATE INDEX ON movies(year);
 CREATE INDEX ON movies(cluster);
-
 
 CREATE TABLE movie_details (
     imdb_id VARCHAR(512) PRIMARY KEY,
