@@ -34,7 +34,7 @@ func Seed(cmd *cobra.Command, args []string) error {
 
 	logrus.Infof("connected to %s", addr)
 
-	loader.SetDatasetDir("./datasets/100k")
+	loader.SetDatasetDir(viper.GetString("ml.dataset_dir"))
 	if err := loader.LoadMovies(); err != nil {
 		return err
 	}

@@ -8,3 +8,11 @@ password = "popcorn"
 hostname = "localhost"
 port = 5432
 ssl_mode = "disable"
+
+[ml]
+dataset_dir = "./datasets/100k"
+steps = 5000
+epoch = 100
+regularization = 0.5
+learning_rate = 0.0005
+feature_dim = 10

@@ -77,6 +77,11 @@ type IterativeFactorizer struct {
 	testSet map[loader.UserID]map[loader.MovieID]float64
 }
 
+// MovieFeatures returns a map of movie ID to its feature vector.
+func (f *IterativeFactorizer) MovieFeatures() map[loader.MovieID][]float64 {
+	return f.movieLatentMap
+}
+
 // Users return the list of all user ID(s) in factorizer.
 func (f *IterativeFactorizer) Users() []loader.UserID {
 	ids := make([]loader.UserID, 0, len(f.userLatentMap))
@@ -143,6 +148,52 @@ func (f *IterativeFactorizer) Loss(reg float64) (loss, rmse float64, err error) 
 	rmse = math.Sqrt(rmse / float64(count))
 
 	return
+}
+
+// Train performs gradient descent training on latent vectors of users and movies.
+func (f *IterativeFactorizer) Train(steps, epoch int, reg, learnRate float64) error {
+	for i := 0; i < steps; i++ {
+		if i%epoch == 0 {
+			loss, rmse, err := f.Loss(reg)
+			if err != nil {
+				return err
+			}
+
+			logrus.Infof("%3d/%d loss = %5.2f & rmse = %1.8f", i, steps, loss, rmse)
+		}
+
+		var err error
+		uGrad := make(map[loader.UserID][]float64)
+		for userID := range f.userLatentMap {
+			uGrad[userID], err = f.userLatentGradient(userID, reg)
+			if err != nil {
+				return err
+			}
+		}
+
+		mGrad := make(map[loader.MovieID][]float64)
+		for movieID := range f.movieLatentMap {
+			mGrad[movieID], err = f.movieLatentGradient(movieID, reg)
+			if err != nil {
+				return err
+			}
+		}
+
+		// Perform latent vector updates, only after all gradients have been computed.
+		for userID := range f.userLatentMap {
+			for k := 0; k < len(f.userLatentMap[userID]); k++ {
+				f.userLatentMap[userID][k] -= learnRate * uGrad[userID][k]
+			}
+		}
+
+		for movieID := range f.movieLatentMap {
+			for k := 0; k < len(f.movieLatentMap[movieID]); k++ {
+				f.movieLatentMap[movieID][k] -= learnRate * mGrad[movieID][k]
+			}
+		}
+	}
+
+	return nil
 }
 
 func (f *IterativeFactorizer) userLatentGradient(id loader.UserID, reg float64) ([]float64, error) {

@@ -5,7 +5,7 @@ import (
 	"net"
 	"os"
 	"popcorn/recommender/pb/movie"
-	"popcorn/recommender/rec"
+	"popcorn/recommender/recommendation"
 
 	"github.com/caarlos0/env"
 	"github.com/sirupsen/logrus"
@@ -52,7 +52,7 @@ func Serve(cmd *cobra.Command, args []string) error {
 	}
 
 	srv := grpc.NewServer()
-	movie.RegisterRecommendationServer(srv, &rec.Server{})
+	movie.RegisterRecommendationServer(srv, &recommendation.Server{})
 
 	logrus.Infof("recommender is listening and serving on port %d", viper.GetInt("grpc.port"))
 	return srv.Serve(lis)

@@ -1,4 +1,4 @@
-package rec
+package recommendation
 
 import (
 	"context"

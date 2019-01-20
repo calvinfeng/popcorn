@@ -42,6 +42,16 @@ func main() {
 			Use:   "seed",
 			RunE:  cmd.Seed,
 		},
+		&cobra.Command{
+			Short: "Train the recommendation model",
+			Use:   "train",
+			RunE:  cmd.Train,
+		},
+		&cobra.Command{
+			Short: "Group movies together by feature vector",
+			Use:   "group",
+			RunE:  cmd.Group,
+		},
 	)
 
 	if err := root.Execute(); err != nil {
