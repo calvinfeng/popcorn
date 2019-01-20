@@ -37,8 +37,8 @@ func average(list []float64) float64 {
 func absMax(M *mat.Dense) float64 {
 	I, J := M.Dims()
 	max := 0.0
-	for i := 0; i < I; i += 1 {
-		for j := 0; j < J; j += 1 {
+	for i := 0; i < I; i++ {
+		for j := 0; j < J; j++ {
 			if math.Abs(M.At(i, j)) > max {
 				max = math.Abs(M.At(i, j))
 			}
@@ -51,8 +51,8 @@ func absMax(M *mat.Dense) float64 {
 func absAverage(M *mat.Dense) float64 {
 	I, J := M.Dims()
 	sum := 0.0
-	for i := 0; i < I; i += 1 {
-		for j := 0; j < J; j += 1 {
+	for i := 0; i < I; i++ {
+		for j := 0; j < J; j++ {
 			sum += math.Abs(M.At(i, j))
 		}
 	}
@@ -66,7 +66,7 @@ func dotProduct(vector1 []float64, vector2 []float64) (float64, error) {
 		return sum, errors.New("dimension mismatch")
 	}
 
-	for i := 0; i < len(vector1); i += 1 {
+	for i := 0; i < len(vector1); i++ {
 		sum += vector1[i] * vector2[i]
 	}
 
@@ -75,7 +75,7 @@ func dotProduct(vector1 []float64, vector2 []float64) (float64, error) {
 
 func randVector(K int) []float64 {
 	vector := make([]float64, K)
-	for k := 0; k < K; k += 1 {
+	for k := 0; k < K; k++ {
 		vector[k] = rand.Float64()
 	}
 

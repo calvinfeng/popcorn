@@ -2,28 +2,99 @@ package lowrank
 
 import (
 	"math"
+	"math/rand"
 	"popcorn/recommender/loader"
-	"popcorn/recommender/model"
+
+	"github.com/sirupsen/logrus"
 )
+
+// NewIterativeFactorizer returns a new instance of iterative factorizer.
+func NewIterativeFactorizer(dir string, K int) (*IterativeFactorizer, error) {
+	loader.SetDatasetDir(dir)
+
+	if err := loader.LoadMovies(); err != nil {
+		return nil, err
+	}
+
+	if err := loader.LoadRatings(); err != nil {
+		return nil, err
+	}
+
+	f := &IterativeFactorizer{
+		userLatentMap:  make(map[loader.UserID][]float64),
+		movieLatentMap: make(map[loader.MovieID][]float64),
+		userRating:     make(map[loader.UserID]map[loader.MovieID]float64),
+		movieRating:    make(map[loader.MovieID]map[loader.UserID]float64),
+		testSet:        make(map[loader.UserID]map[loader.MovieID]float64),
+	}
+
+	var trainCount, testCount int
+
+	ratings := loader.RatingsFilteredByCount(minRatingsPerUser)
+	for userID := range ratings {
+		f.userLatentMap[userID] = randVector(K)
+		f.userRating[userID] = make(map[loader.MovieID]float64)
+		f.testSet[userID] = make(map[loader.MovieID]float64)
+
+		for movieID := range ratings[userID] {
+			if _, ok := f.movieLatentMap[movieID]; !ok {
+				f.movieLatentMap[movieID] = randVector(K)
+				f.movieRating[movieID] = make(map[loader.UserID]float64)
+			}
+
+			if rand.Float64() < trainTestRatio {
+				f.testSet[userID][movieID] = ratings[userID][movieID]
+				testCount++
+			} else {
+				f.userRating[userID][movieID] = ratings[userID][movieID]
+				f.movieRating[movieID][userID] = ratings[userID][movieID]
+				trainCount++
+			}
+		}
+	}
+
+	logrus.Infof("factorizer has been initialized with %d training examples and %d test examples",
+		trainCount, testCount)
+
+	return f, nil
+}
 
 // IterativeFactorizer is optimized for sparsed matrix factorization. Instead of having a matrix
 // with mostly empty values, it uses a map of user ID to map of movie ID to rating, and a map of
 // movie ID to a map of user ID to movie ID.
 type IterativeFactorizer struct {
-	movies map[loader.MovieID]*model.Movie
-
 	// Result of factorization
 	userLatentMap  map[loader.UserID][]float64
 	movieLatentMap map[loader.MovieID][]float64
 
-	// userRating is a map of user ID to a map of movieID to rating submitted by the user.
+	// Map of user ID to a map of movieID to rating submitted by the user.
 	userRating map[loader.UserID]map[loader.MovieID]float64
 
-	// movieRating is a map of movie ID to a map of user ID to rating submitted by the user.
+	// Map of movie ID to a map of user ID to rating submitted by the user.
 	movieRating map[loader.MovieID]map[loader.UserID]float64
 
-	// Validation/Test phase
+	// Validation/Test set which is user-centric.
 	testSet map[loader.UserID]map[loader.MovieID]float64
+}
+
+// Users return the list of all user ID(s) in factorizer.
+func (f *IterativeFactorizer) Users() []loader.UserID {
+	ids := make([]loader.UserID, 0, len(f.userLatentMap))
+	for id := range f.userLatentMap {
+		ids = append(ids, id)
+	}
+
+	return ids
+}
+
+// Movies return the list of all movie ID(s) in factorizer.
+func (f *IterativeFactorizer) Movies() []loader.MovieID {
+	ids := make([]loader.MovieID, 0, len(f.movieLatentMap))
+	for id := range f.movieLatentMap {
+		ids = append(ids, id)
+	}
+
+	return ids
 }
 
 // Loss returns the loss and validation root mean square error from current training result.
