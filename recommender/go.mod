@@ -15,9 +15,12 @@ require (
 	github.com/jinzhu/now v0.0.0-20181116074157-8ec929ed50c3 // indirect
 	github.com/lib/pq v1.0.0
 	github.com/mattn/go-sqlite3 v1.10.0 // indirect
+	github.com/schollz/progressbar v1.0.0
 	github.com/sirupsen/logrus v1.3.0
 	github.com/spf13/cobra v0.0.3
 	github.com/spf13/viper v1.3.1
+	github.com/stretchr/testify v1.2.2
 	golang.org/x/arch v0.0.0-20181203225421-5a4828bb7045 // indirect
+	gonum.org/v1/gonum v0.0.0-20190119014124-d54847ab4dca
 	google.golang.org/grpc v1.17.0
 )

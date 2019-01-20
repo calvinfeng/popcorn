@@ -1,4 +1,4 @@
-package seeder
+package loader
 
 import (
 	"bufio"
@@ -14,24 +14,7 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-var dataDir string
-var movies = make(map[uint]*model.Movie)
-
-func GetMovies() []*model.Movie {
-	list := make([]*model.Movie, 0, len(movies))
-	for _, movie := range movies {
-		list = append(list, movie)
-	}
-
-	return list
-}
-
-// SetDatasetDir configures a dataset directory for which to find CSV data from.
-func SetDatasetDir(dir string) {
-	dataDir = dir
-}
-
-// LoadMovies grabs movie data from CSV file in dataset directory.
+// LoadMovies grabs movie data from CSV file into memory.
 func LoadMovies() error {
 	csvFile, err := os.Open(fmt.Sprintf("%s/movies.csv", dataDir))
 	if err != nil {
@@ -63,7 +46,7 @@ func LoadMovies() error {
 			continue
 		}
 
-		movies[uint(id)] = &model.Movie{
+		movies[MovieID(id)] = &model.Movie{
 			Model: gorm.Model{ID: uint(id)},
 			Year:  int(year),
 			Title: strings.Trim(row[1], " "+yearStr),
