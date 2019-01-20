@@ -46,7 +46,7 @@ func LoadMovies() error {
 			continue
 		}
 
-		movies[movieID(id)] = &model.Movie{
+		movies[MovieID(id)] = &model.Movie{
 			Model: gorm.Model{ID: uint(id)},
 			Year:  int(year),
 			Title: strings.Trim(row[1], " "+yearStr),

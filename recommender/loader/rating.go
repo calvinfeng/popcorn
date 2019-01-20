@@ -56,11 +56,11 @@ func LoadRatings() error {
 			continue
 		}
 
-		if _, ok := ratings[userID(uid)]; !ok {
-			ratings[userID(uid)] = make(map[movieID]float64)
+		if _, ok := ratings[UserID(uid)]; !ok {
+			ratings[UserID(uid)] = make(map[MovieID]float64)
 		}
 
-		ratings[userID(uid)][movieID(mid)] = rating
+		ratings[UserID(uid)][MovieID(mid)] = rating
 	}
 
 	return nil
@@ -70,13 +70,13 @@ func LoadRatings() error {
 // every user that rated the movie.
 func AddRatingStatsToMovies() {
 	for _, rated := range ratings {
-		for movieID, val := range rated {
-			if _, ok := movies[movieID]; !ok {
+		for MovieID, val := range rated {
+			if _, ok := movies[MovieID]; !ok {
 				continue
 			}
 
-			movies[movieID].AverageRating += float32(val)
-			movies[movieID].NumRating++
+			movies[MovieID].AverageRating += float32(val)
+			movies[MovieID].NumRating++
 		}
 	}
 
