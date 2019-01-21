@@ -9,14 +9,23 @@ message Movie {
   double predicted_rating = 4;
 }
 
-message RecRequest {
-  int64 user_id = 1;
+message RecommendRequest {
+  string user_email = 1;
 }
 
-message RecResponse {
+message RecommendResponse {
   repeated Movie movies = 1;
 }
 
+message UpdateRequest {
+  string user_email = 1;
+}
+
+message UpdateResponse {
+  bool accepted = 1;
+}
+
 service Recommendation {
-  rpc Fetch(RecRequest) returns (RecResponse);
+  rpc Fetch(RecommendRequest) returns (RecommendResponse);
+  rpc UpdateUserPreference(UpdateRequest) returns (UpdateResponse);
 }
