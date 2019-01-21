@@ -17,8 +17,9 @@ import (
 
 // EnvConfig captures environmental variable
 type EnvConfig struct {
-	GCP    bool `env:"GCP"    envDefault:"false"`
-	Docker bool `env:"DOCKER" envDefault:"false"`
+	GCP      bool `env:"GCP"    envDefault:"false"`
+	Docker   bool `env:"DOCKER" envDefault:"false"`
+	Training bool `env:"TRAIN"  envDefault:"false"`
 }
 
 func init() {
@@ -33,6 +34,8 @@ func configureViper() error {
 
 	if cfg.GCP {
 		viper.SetConfigName("production")
+	} else if cfg.Training {
+		viper.SetConfigName("training")
 	} else {
 		viper.SetConfigName("development")
 	}
