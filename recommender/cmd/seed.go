@@ -51,6 +51,10 @@ func Seed(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
+	if err := loader.LoadFeatures(); err != nil {
+		return err
+	}
+
 	loader.AddRatingStatsToMovies()
 
 	movies := loader.Movies()

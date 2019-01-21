@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestGradientCalculation(t *testing.T) {
+func TestTrainingGradientCalculation(t *testing.T) {
 	rand.Seed(time.Now().Unix())
 
 	f, err := lowrank.NewIterativeFactorizer("../datasets/100k", 10)

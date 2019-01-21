@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"popcorn/recommender/model"
 	"strconv"
 )
 
@@ -56,11 +57,11 @@ func LoadRatings() error {
 			continue
 		}
 
-		if _, ok := ratings[UserID(uid)]; !ok {
-			ratings[UserID(uid)] = make(map[MovieID]float64)
+		if _, ok := ratings[model.UserID(uid)]; !ok {
+			ratings[model.UserID(uid)] = make(map[model.MovieID]float64)
 		}
 
-		ratings[UserID(uid)][MovieID(mid)] = rating
+		ratings[model.UserID(uid)][model.MovieID(mid)] = rating
 	}
 
 	return nil
@@ -70,13 +71,13 @@ func LoadRatings() error {
 // every user that rated the movie.
 func AddRatingStatsToMovies() {
 	for _, rated := range ratings {
-		for MovieID, val := range rated {
-			if _, ok := movies[MovieID]; !ok {
+		for movieID, val := range rated {
+			if _, ok := movies[movieID]; !ok {
 				continue
 			}
 
-			movies[MovieID].AverageRating += float32(val)
-			movies[MovieID].NumRating++
+			movies[movieID].AverageRating += float32(val)
+			movies[movieID].NumRating++
 		}
 	}
 

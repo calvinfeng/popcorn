@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"net"
 	"os"
-	"popcorn/recommender/pb/movie"
+	"popcorn/recommender/model"
+	pbmovie "popcorn/recommender/pb/movie"
 	"popcorn/recommender/recommendation"
 
 	"github.com/caarlos0/env"
@@ -16,8 +17,9 @@ import (
 
 // EnvConfig captures environmental variable
 type EnvConfig struct {
-	GCP    bool `env:"GCP"    envDefault:"false"`
-	Docker bool `env:"DOCKER" envDefault:"false"`
+	GCP      bool `env:"GCP"    envDefault:"false"`
+	Docker   bool `env:"DOCKER" envDefault:"false"`
+	Training bool `env:"TRAIN"  envDefault:"false"`
 }
 
 func init() {
@@ -32,6 +34,8 @@ func configureViper() error {
 
 	if cfg.GCP {
 		viper.SetConfigName("production")
+	} else if cfg.Training {
+		viper.SetConfigName("training")
 	} else {
 		viper.SetConfigName("development")
 	}
@@ -51,8 +55,16 @@ func Serve(cmd *cobra.Command, args []string) error {
 		os.Exit(1)
 	}
 
+	if err := model.ConnectDB(); err != nil {
+		return err
+	}
+
+	if err := recommendation.InitTrainer(); err != nil {
+		return err
+	}
+
 	srv := grpc.NewServer()
-	movie.RegisterRecommendationServer(srv, &recommendation.Server{})
+	pbmovie.RegisterRecommendationServer(srv, &recommendation.Server{})
 
 	logrus.Infof("recommender is listening and serving on port %d", viper.GetInt("grpc.port"))
 	return srv.Serve(lis)

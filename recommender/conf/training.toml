@@ -10,7 +10,7 @@ port = 5432
 ssl_mode = "disable"
 
 [ml]
-dataset_dir = "./datasets/100k"
+dataset_dir = "./datasets/27m"
 steps = 10
 epoch = 1
 regularization = 0.05
