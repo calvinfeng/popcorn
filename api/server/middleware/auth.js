@@ -13,7 +13,7 @@ async function verify(token) {
   return ticket.getPayload();;
 }
 
-function userAuthentication(req, res, next) {  
+function userAuthMiddleware(req, res, next) {  
   if (!req.get('token')) {
     res.status(400);
     res.send({
@@ -34,4 +34,4 @@ function userAuthentication(req, res, next) {
   });
 }
 
-module.exports = userAuthentication;
+module.exports = userAuthMiddleware;
