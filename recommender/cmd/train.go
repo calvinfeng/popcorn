@@ -15,6 +15,8 @@ func Train(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
+	lowrank.SetMinRatingsPerUser(viper.GetInt("min_ratings_per_user"))
+
 	f, err := lowrank.NewIterativeFactorizer(viper.GetString("ml.dataset_dir"),
 		viper.GetInt("ml.feature_dim"))
 	if err != nil {

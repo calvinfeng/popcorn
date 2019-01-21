@@ -1,9 +1,11 @@
 package lowrank
 
 import (
+	"fmt"
 	"math"
 	"math/rand"
 	"popcorn/recommender/loader"
+	"time"
 
 	"github.com/sirupsen/logrus"
 )
@@ -162,6 +164,8 @@ func (f *IterativeFactorizer) Train(steps, epoch int, reg, learnRate float64) er
 			logrus.Infof("%3d/%d loss = %5.2f & rmse = %1.8f", i, steps, loss, rmse)
 		}
 
+		start := time.Now()
+
 		var err error
 		uGrad := make(map[loader.UserID][]float64)
 		for userID := range f.userLatentMap {
@@ -191,6 +195,8 @@ func (f *IterativeFactorizer) Train(steps, epoch int, reg, learnRate float64) er
 				f.movieLatentMap[movieID][k] -= learnRate * mGrad[movieID][k]
 			}
 		}
+
+		fmt.Printf("%d/%d elapsed time: %s\n", i, steps, time.Since(start))
 	}
 
 	return nil
