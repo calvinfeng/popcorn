@@ -8,8 +8,8 @@ import (
 // Rating is a movie rating submitted by user.
 type Rating struct {
 	gorm.Model
-	MovieID   uint    `gorm:"column:movie_id"`
 	UserEmail string  `gorm:"column:user_email"`
+	MovieID   MovieID `gorm:"column:movie_id"`
 	Value     float32 `gorm:"column:value"`
 }
 
@@ -21,7 +21,7 @@ func (*Rating) TableName() string {
 // Preference is a user preference for movie.
 type Preference struct {
 	gorm.Model
-	UserEmail uint            `gorm:"column:user_email"`
+	UserEmail string          `gorm:"column:user_email"`
 	Value     pq.Float64Array `gorm:"column:value"`
 }
 
