@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"popcorn/recommender/model"
 	"strconv"
 )
 
@@ -30,12 +31,12 @@ func LoadMetadata() error {
 			continue
 		}
 
-		if _, ok := movies[MovieID(id)]; !ok {
+		if _, ok := movies[model.MovieID(id)]; !ok {
 			continue
 		}
 
-		movies[MovieID(id)].IMDBID = "tt" + row[1]
-		movies[MovieID(id)].TMDBID = row[2]
+		movies[model.MovieID(id)].IMDBID = "tt" + row[1]
+		movies[model.MovieID(id)].TMDBID = row[2]
 	}
 
 	return nil
@@ -62,15 +63,15 @@ func LoadTags() error {
 			continue
 		}
 
-		if _, ok := movies[MovieID(id)]; !ok {
+		if _, ok := movies[model.MovieID(id)]; !ok {
 			continue
 		}
 
-		if movies[MovieID(id)].Tags == nil {
-			movies[MovieID(id)].Tags = []string{}
+		if movies[model.MovieID(id)].Tags == nil {
+			movies[model.MovieID(id)].Tags = []string{}
 		}
 
-		movies[MovieID(id)].Tags = append(movies[MovieID(id)].Tags, row[2])
+		movies[model.MovieID(id)].Tags = append(movies[model.MovieID(id)].Tags, row[2])
 	}
 
 	return nil

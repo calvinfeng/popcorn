@@ -3,11 +3,11 @@ package lowrank
 import (
 	"errors"
 	"math"
-	"popcorn/recommender/loader"
+	"popcorn/recommender/model"
 )
 
 // NewTrainer returns a trainer with movie latent map intialized.
-func NewTrainer(latents map[loader.MovieID][]float64) *Trainer {
+func NewTrainer(latents map[model.MovieID][]float64) *Trainer {
 	return &Trainer{
 		movieLatentMap: latents,
 	}
@@ -18,14 +18,14 @@ func NewTrainer(latents map[loader.MovieID][]float64) *Trainer {
 // with pretrained movie features. Whenever frontend server makes a gRPC request to update user
 // preference, this trainer will train the user.
 type Trainer struct {
-	userRatings    map[loader.MovieID]float64
+	userRatings    map[model.MovieID]float64
 	userPreference []float64
 
-	movieLatentMap map[loader.MovieID][]float64
+	movieLatentMap map[model.MovieID][]float64
 }
 
 // SetUser assigns a user to trainer.
-func (t *Trainer) SetUser(id loader.UserID, ratings map[loader.MovieID]float64, pref []float64) {
+func (t *Trainer) SetUser(id model.UserID, ratings map[model.MovieID]float64, pref []float64) {
 	t.userRatings = ratings
 	t.userPreference = pref
 }

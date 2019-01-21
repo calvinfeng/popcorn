@@ -10,8 +10,6 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
-
-	"github.com/jinzhu/gorm"
 )
 
 // LoadMovies grabs movie data from CSV file into memory.
@@ -46,8 +44,8 @@ func LoadMovies() error {
 			continue
 		}
 
-		movies[MovieID(id)] = &model.Movie{
-			Model: gorm.Model{ID: uint(id)},
+		movies[model.MovieID(id)] = &model.Movie{
+			ID:    model.MovieID(id),
 			Year:  int(year),
 			Title: strings.Trim(row[1], " "+yearStr),
 		}

@@ -6,11 +6,12 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"popcorn/recommender/model"
 	"strconv"
 )
 
 // ExportMovieLatentVector saves movie features to a CSV file.
-func ExportMovieLatentVector(features map[MovieID][]float64, K int) error {
+func ExportMovieLatentVector(features map[model.MovieID][]float64, K int) error {
 	csvFile, err := os.Create(fmt.Sprintf("%s/features.csv", dataDir))
 	if err != nil {
 		return err
@@ -66,7 +67,7 @@ func LoadFeatures() error {
 			continue
 		}
 
-		movie, ok := movies[MovieID(id)]
+		movie, ok := movies[model.MovieID(id)]
 		if !ok {
 			continue
 		}

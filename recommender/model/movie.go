@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/jinzhu/gorm"
 	"github.com/lib/pq"
 )
 
@@ -19,11 +18,22 @@ func AllMovies() ([]*Movie, error) {
 	return all, nil
 }
 
+type (
+	// MovieID is an alias to avoid confusing uint with UserID.
+	MovieID uint
+
+	// UserID is an alias to avoid confusing uint with MovieID.
+	UserID uint
+)
+
 // Movie is a model for movie entity.
 type Movie struct {
-	gorm.Model
-	TMDBID string `gorm:"column:tmdb_id"`
-	IMDBID string `gorm:"column:imdb_id"`
+	ID        MovieID    `gorm:"column:id;primary_key"`
+	CreatedAt time.Time  `gorm:"column:created_at"`
+	UpdatedAt time.Time  `gorm:"column:updated_at"`
+	DeletedAt *time.Time `gorm:"column:deleted_at"`
+	TMDBID    string     `gorm:"column:tmdb_id"`
+	IMDBID    string     `gorm:"column:imdb_id"`
 
 	Title string `gorm:"column:title"`
 	Year  int    `gorm:"column:year"`

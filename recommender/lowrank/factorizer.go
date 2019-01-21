@@ -5,6 +5,7 @@ import (
 	"math"
 	"math/rand"
 	"popcorn/recommender/loader"
+	"popcorn/recommender/model"
 	"time"
 
 	"github.com/sirupsen/logrus"
@@ -23,11 +24,11 @@ func NewIterativeFactorizer(dir string, K int) (*IterativeFactorizer, error) {
 	}
 
 	f := &IterativeFactorizer{
-		userLatentMap:  make(map[loader.UserID][]float64),
-		movieLatentMap: make(map[loader.MovieID][]float64),
-		userRating:     make(map[loader.UserID]map[loader.MovieID]float64),
-		movieRating:    make(map[loader.MovieID]map[loader.UserID]float64),
-		testSet:        make(map[loader.UserID]map[loader.MovieID]float64),
+		userLatentMap:  make(map[model.UserID][]float64),
+		movieLatentMap: make(map[model.MovieID][]float64),
+		userRating:     make(map[model.UserID]map[model.MovieID]float64),
+		movieRating:    make(map[model.MovieID]map[model.UserID]float64),
+		testSet:        make(map[model.UserID]map[model.MovieID]float64),
 	}
 
 	var trainCount, testCount int
@@ -35,13 +36,13 @@ func NewIterativeFactorizer(dir string, K int) (*IterativeFactorizer, error) {
 	ratings := loader.RatingsFilteredByCount(minRatingsPerUser)
 	for userID := range ratings {
 		f.userLatentMap[userID] = randVector(K)
-		f.userRating[userID] = make(map[loader.MovieID]float64)
-		f.testSet[userID] = make(map[loader.MovieID]float64)
+		f.userRating[userID] = make(map[model.MovieID]float64)
+		f.testSet[userID] = make(map[model.MovieID]float64)
 
 		for movieID := range ratings[userID] {
 			if _, ok := f.movieLatentMap[movieID]; !ok {
 				f.movieLatentMap[movieID] = randVector(K)
-				f.movieRating[movieID] = make(map[loader.UserID]float64)
+				f.movieRating[movieID] = make(map[model.UserID]float64)
 			}
 
 			if rand.Float64() < trainTestRatio {
@@ -66,27 +67,27 @@ func NewIterativeFactorizer(dir string, K int) (*IterativeFactorizer, error) {
 // movie ID to a map of user ID to movie ID.
 type IterativeFactorizer struct {
 	// Result of factorization
-	userLatentMap  map[loader.UserID][]float64
-	movieLatentMap map[loader.MovieID][]float64
+	userLatentMap  map[model.UserID][]float64
+	movieLatentMap map[model.MovieID][]float64
 
 	// Map of user ID to a map of movieID to rating submitted by the user.
-	userRating map[loader.UserID]map[loader.MovieID]float64
+	userRating map[model.UserID]map[model.MovieID]float64
 
 	// Map of movie ID to a map of user ID to rating submitted by the user.
-	movieRating map[loader.MovieID]map[loader.UserID]float64
+	movieRating map[model.MovieID]map[model.UserID]float64
 
 	// Validation/Test set which is user-centric.
-	testSet map[loader.UserID]map[loader.MovieID]float64
+	testSet map[model.UserID]map[model.MovieID]float64
 }
 
 // MovieFeatures returns a map of movie ID to its feature vector.
-func (f *IterativeFactorizer) MovieFeatures() map[loader.MovieID][]float64 {
+func (f *IterativeFactorizer) MovieFeatures() map[model.MovieID][]float64 {
 	return f.movieLatentMap
 }
 
 // Users return the list of all user ID(s) in factorizer.
-func (f *IterativeFactorizer) Users() []loader.UserID {
-	ids := make([]loader.UserID, 0, len(f.userLatentMap))
+func (f *IterativeFactorizer) Users() []model.UserID {
+	ids := make([]model.UserID, 0, len(f.userLatentMap))
 	for id := range f.userLatentMap {
 		ids = append(ids, id)
 	}
@@ -95,8 +96,8 @@ func (f *IterativeFactorizer) Users() []loader.UserID {
 }
 
 // Movies return the list of all movie ID(s) in factorizer.
-func (f *IterativeFactorizer) Movies() []loader.MovieID {
-	ids := make([]loader.MovieID, 0, len(f.movieLatentMap))
+func (f *IterativeFactorizer) Movies() []model.MovieID {
+	ids := make([]model.MovieID, 0, len(f.movieLatentMap))
 	for id := range f.movieLatentMap {
 		ids = append(ids, id)
 	}
@@ -167,7 +168,7 @@ func (f *IterativeFactorizer) Train(steps, epoch int, reg, learnRate float64) er
 		start := time.Now()
 
 		var err error
-		uGrad := make(map[loader.UserID][]float64)
+		uGrad := make(map[model.UserID][]float64)
 		for userID := range f.userLatentMap {
 			uGrad[userID], err = f.userLatentGradient(userID, reg)
 			if err != nil {
@@ -175,7 +176,7 @@ func (f *IterativeFactorizer) Train(steps, epoch int, reg, learnRate float64) er
 			}
 		}
 
-		mGrad := make(map[loader.MovieID][]float64)
+		mGrad := make(map[model.MovieID][]float64)
 		for movieID := range f.movieLatentMap {
 			mGrad[movieID], err = f.movieLatentGradient(movieID, reg)
 			if err != nil {
@@ -202,7 +203,7 @@ func (f *IterativeFactorizer) Train(steps, epoch int, reg, learnRate float64) er
 	return nil
 }
 
-func (f *IterativeFactorizer) userLatentGradient(id loader.UserID, reg float64) ([]float64, error) {
+func (f *IterativeFactorizer) userLatentGradient(id model.UserID, reg float64) ([]float64, error) {
 	latent := f.userLatentMap[id]
 
 	grad := make([]float64, len(latent))
@@ -222,7 +223,7 @@ func (f *IterativeFactorizer) userLatentGradient(id loader.UserID, reg float64) 
 	return grad, nil
 }
 
-func (f *IterativeFactorizer) movieLatentGradient(id loader.MovieID, reg float64) ([]float64, error) {
+func (f *IterativeFactorizer) movieLatentGradient(id model.MovieID, reg float64) ([]float64, error) {
 	latent := f.movieLatentMap[id]
 
 	grad := make([]float64, len(latent))

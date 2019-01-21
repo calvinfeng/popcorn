@@ -1,7 +1,6 @@
 package recommendation
 
 import (
-	"popcorn/recommender/loader"
 	"popcorn/recommender/lowrank"
 	"popcorn/recommender/model"
 )
@@ -16,13 +15,13 @@ func InitTrainer() error {
 		return err
 	}
 
-	movieLatentMap := make(map[loader.MovieID][]float64)
+	movieLatentMap := make(map[model.MovieID][]float64)
 	for _, movie := range movies {
 		if len(movie.Feature) == 0 {
 			continue
 		}
 
-		movieLatentMap[loader.MovieID(movie.ID)] = movie.Feature
+		movieLatentMap[movie.ID] = movie.Feature
 	}
 
 	trainer = lowrank.NewTrainer(movieLatentMap)

@@ -2,12 +2,12 @@ package lowrank
 
 import (
 	"math"
-	"popcorn/recommender/loader"
+	"popcorn/recommender/model"
 )
 
 // UserLatentGradientCheck performs gradient check on a factorizer's gradient computation for user
 // latent vector.
-func UserLatentGradientCheck(f *IterativeFactorizer, id loader.UserID, reg, h float64) ([]float64, error) {
+func UserLatentGradientCheck(f *IterativeFactorizer, id model.UserID, reg, h float64) ([]float64, error) {
 	grad, err := f.userLatentGradient(id, reg)
 	if err != nil {
 		return nil, err
@@ -42,7 +42,7 @@ func UserLatentGradientCheck(f *IterativeFactorizer, id loader.UserID, reg, h fl
 
 // MovieLatentGradientCheck performs gradient check on a factorizer's gradient computation for movie
 // latent vector.
-func MovieLatentGradientCheck(f *IterativeFactorizer, id loader.MovieID, reg, h float64) ([]float64, error) {
+func MovieLatentGradientCheck(f *IterativeFactorizer, id model.MovieID, reg, h float64) ([]float64, error) {
 	grad, err := f.movieLatentGradient(id, reg)
 	if err != nil {
 		return nil, err
