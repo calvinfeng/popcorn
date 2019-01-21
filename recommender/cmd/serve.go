@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"net"
 	"os"
-	"popcorn/recommender/pb/movie"
+	"popcorn/recommender/model"
+	pbmovie "popcorn/recommender/pb/movie"
 	"popcorn/recommender/recommendation"
 
 	"github.com/caarlos0/env"
@@ -51,8 +52,16 @@ func Serve(cmd *cobra.Command, args []string) error {
 		os.Exit(1)
 	}
 
+	if err := model.ConnectDB(); err != nil {
+		return err
+	}
+
+	if err := recommendation.InitTrainer(); err != nil {
+		return err
+	}
+
 	srv := grpc.NewServer()
-	movie.RegisterRecommendationServer(srv, &recommendation.Server{})
+	pbmovie.RegisterRecommendationServer(srv, &recommendation.Server{})
 
 	logrus.Infof("recommender is listening and serving on port %d", viper.GetInt("grpc.port"))
 	return srv.Serve(lis)

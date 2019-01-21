@@ -47,11 +47,6 @@ func main() {
 			Use:   "train",
 			RunE:  cmd.Train,
 		},
-		&cobra.Command{
-			Short: "Group movies together by feature vector",
-			Use:   "group",
-			RunE:  cmd.Group,
-		},
 	)
 
 	if err := root.Execute(); err != nil {

@@ -8,6 +8,18 @@ import (
 	"github.com/lib/pq"
 )
 
+// AllMovies fetches all movies from database.
+func AllMovies() ([]*Movie, error) {
+	all := []*Movie{}
+
+	if err := db.Find(&all).Error; err != nil {
+		return nil, err
+	}
+
+	return all, nil
+}
+
+// Movie is a model for movie entity.
 type Movie struct {
 	gorm.Model
 	TMDBID string `gorm:"column:tmdb_id"`
@@ -31,10 +43,12 @@ type Movie struct {
 	Ratings []*Rating `gorm:"foreignkey:MovieID"`
 }
 
+// TableName returns database table name which this entity is mapping to.
 func (*Movie) TableName() string {
 	return "movies"
 }
 
+// MovieDetail contains poster url and high level description of a movie.
 type MovieDetail struct {
 	IMDBID    string          `gorm:"column:imdb_id; primary_key"`
 	CreatedAt time.Time       `gorm:"column:created_at"`
@@ -42,10 +56,12 @@ type MovieDetail struct {
 	Detail    json.RawMessage `gorm:"column:detail"`
 }
 
+// TableName returns database table name which this entity is mapping to.
 func (*MovieDetail) TableName() string {
 	return "movie_details"
 }
 
+// MovieTrailer contains video URL of a movie trailer.
 type MovieTrailer struct {
 	IMDBID    string          `gorm:"column:imdb_id; primary_key"`
 	CreatedAt time.Time       `gorm:"column:created_at"`
@@ -53,6 +69,7 @@ type MovieTrailer struct {
 	Trailer   json.RawMessage `gorm:"column:trailer"`
 }
 
+// TableName returns database table name which this entity is mapping to.
 func (*MovieTrailer) TableName() string {
 	return "movie_trailers"
 }

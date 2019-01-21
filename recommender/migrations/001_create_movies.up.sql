@@ -10,7 +10,7 @@ CREATE TABLE movies (
     num_rating INTEGER,
     imdb_rating REAL,
     average_rating REAL,
-    tags VARCHAR(128)[],
+    tags VARCHAR(512)[],
     feature DOUBLE PRECISION[],
     cluster SMALLINT,
     nearest_clusters SMALLINT[],
