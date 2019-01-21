@@ -1,14 +1,16 @@
 const router = require('express').Router();
-const pool = require('../../db');
+const { pool } = require('../../db');
 
-router.get('/details/:id', async (req, res) => {
+router.get('/details/:imdb_id', async (req, res) => {
   // add validation using joi library
   const client = await pool.connect();
-  const id = parseInt(req.params.id);
+  const imdb_id = req.params.imdb_id;
   try {
-    const res = await pool.query('SELECT * FROM movie_details WHERE id = $1', [id]);
-    console.log(res);
-    res.send(res.rows[0]);
+    const result = await pool.query('SELECT * From movie_details WHERE imdb_id = $1', [imdb_id]);
+    result.rows.forEach((row) => {
+      console.log(row.detail.toString());
+    })
+    res.send(result.rows);
   } 
   catch(err) {
     res.status(404).send(`The movie with the given ID ${id} was not found.`);
@@ -17,3 +19,5 @@ router.get('/details/:id', async (req, res) => {
     client.release();
   }
 })
+
+module.exports = router;
