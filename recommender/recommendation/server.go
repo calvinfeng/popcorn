@@ -11,8 +11,8 @@ import (
 type Server struct{}
 
 // Fetch returns a list of recommended movies.
-func (srv *Server) Fetch(ctx context.Context, req *movie.RecRequest) (*movie.RecResponse, error) {
-	logrus.Infof("server received request to fetch movie for user %d", req.UserId)
+func (srv *Server) Fetch(ctx context.Context, req *movie.RecommendRequest) (*movie.RecommendResponse, error) {
+	logrus.Infof("server received request to fetch movie for user %s", req.UserEmail)
 
 	movies := []*movie.Movie{
 		&movie.Movie{
@@ -23,5 +23,10 @@ func (srv *Server) Fetch(ctx context.Context, req *movie.RecRequest) (*movie.Rec
 		},
 	}
 
-	return &movie.RecResponse{Movies: movies}, nil
+	return &movie.RecommendResponse{Movies: movies}, nil
+}
+
+// UpdateUserPreference queues a training task.
+func (srv *Server) UpdateUserPreference(ctx context.Context, req *movie.UpdateRequest) (*movie.UpdateResponse, error) {
+	return &movie.UpdateResponse{Accepted: true}, nil
 }

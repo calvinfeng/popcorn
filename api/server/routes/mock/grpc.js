@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const messages = require('../../pb/movie/movie_pb');
 
-router.get('/:userID', (req, res) => {
+router.get('/:email', (req, res) => {
   const cli = res.locals.grpc_client;
   res.locals.log.info('client is hitting the mock gRPC endpoints');
   if (cli === undefined) {
@@ -10,8 +10,8 @@ router.get('/:userID', (req, res) => {
     return;
   }
 
-  const request = new messages.RecRequest();
-  request.setUserId(req.params.userID);
+  const request = new messages.RecommendRequest();
+  request.setUserEmail(req.params.email);
   
   cli.fetch(request, (err, rpcRes) => {
     if (err !== null) {
