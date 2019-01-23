@@ -20,7 +20,7 @@ func Query(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	movies, err := model.AllMovies()
+	movies, err := model.FetchAllMovies()
 	if err != nil {
 		return err
 	}

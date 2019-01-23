@@ -7,6 +7,7 @@ import (
 	"popcorn/recommender/model"
 	pbmovie "popcorn/recommender/pb/movie"
 	"popcorn/recommender/recommendation"
+	"time"
 
 	"github.com/caarlos0/env"
 	"github.com/sirupsen/logrus"
@@ -45,6 +46,13 @@ func configureViper() error {
 
 // Serve accepts incoming gRPC requests and handle them with registered services.
 func Serve(cmd *cobra.Command, args []string) error {
+	go func() {
+		for {
+			memUsage()
+			time.Sleep(1 * time.Second)
+		}
+	}()
+
 	if err := configureViper(); err != nil {
 		return err
 	}
@@ -56,6 +64,10 @@ func Serve(cmd *cobra.Command, args []string) error {
 	}
 
 	if err := model.ConnectDB(); err != nil {
+		return err
+	}
+
+	if err := recommendation.InitStore(); err != nil {
 		return err
 	}
 

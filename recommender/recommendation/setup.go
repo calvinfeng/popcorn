@@ -10,7 +10,7 @@ var trainer *lowrank.Trainer
 // InitTrainer pulls all movies from database and initialize a trainer with all the movie features
 // information.
 func InitTrainer() error {
-	movies, err := model.AllMovies()
+	movies, err := model.FetchAllMovies()
 	if err != nil {
 		return err
 	}

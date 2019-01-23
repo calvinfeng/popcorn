@@ -7,15 +7,24 @@ import (
 	"github.com/lib/pq"
 )
 
-// AllMovies fetches all movies from database.
-func AllMovies() ([]*Movie, error) {
-	all := []*Movie{}
-
-	if err := db.Find(&all).Error; err != nil {
-		return nil, err
+// FetchAllMovies fetches all movies from database.
+func FetchAllMovies() (movies []*Movie, err error) {
+	err = db.Find(&movies).Error
+	if err != nil {
+		return
 	}
 
-	return all, nil
+	return
+}
+
+// FetchMovies fetches a list of movies by ID(s).
+func FetchMovies(ids []MovieID) (movies []*Movie, err error) {
+	err = db.Where("id in (?)", ids).Find(&movies).Error
+	if err != nil {
+		return
+	}
+
+	return
 }
 
 type (
