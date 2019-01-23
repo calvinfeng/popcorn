@@ -7,7 +7,7 @@ import (
 	"popcorn/recommender/model"
 	pbmovie "popcorn/recommender/pb/movie"
 	"popcorn/recommender/recommendation"
-	"time"
+	"runtime"
 
 	"github.com/caarlos0/env"
 	"github.com/sirupsen/logrus"
@@ -46,12 +46,12 @@ func configureViper() error {
 
 // Serve accepts incoming gRPC requests and handle them with registered services.
 func Serve(cmd *cobra.Command, args []string) error {
-	go func() {
-		for {
-			memUsage()
-			time.Sleep(1 * time.Second)
-		}
-	}()
+	// go func() {
+	// 	for {
+	// 		memUsage()
+	// 		time.Sleep(1 * time.Second)
+	// 	}
+	// }()
 
 	if err := configureViper(); err != nil {
 		return err
@@ -80,4 +80,21 @@ func Serve(cmd *cobra.Command, args []string) error {
 
 	logrus.Infof("recommender is listening and serving on port %d", viper.GetInt("grpc.port"))
 	return srv.Serve(lis)
+}
+
+// MemUsage outputs the current, total and OS memory being used. As well as the number
+// of garage collection cycles completed.
+//
+// For info on each, see: https://golang.org/pkg/runtime/#MemStats
+func memUsage() {
+	var m runtime.MemStats
+	runtime.ReadMemStats(&m)
+	fmt.Printf("Alloc = %v MiB", bToMb(m.Alloc))
+	fmt.Printf("\tTotalAlloc = %v MiB", bToMb(m.TotalAlloc))
+	fmt.Printf("\tSys = %v MiB", bToMb(m.Sys))
+	fmt.Printf("\tNumGC = %v\n", m.NumGC)
+}
+
+func bToMb(b uint64) uint64 {
+	return b / 1024 / 1024
 }

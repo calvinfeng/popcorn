@@ -5,7 +5,8 @@ CREATE TABLE ratings (
     deleted_at TIMESTAMP WITH TIME ZONE,
     movie_id INTEGER REFERENCES movies(id),
     user_email VARCHAR(256),
-    value REAL 
+    value REAL,
+    UNIQUE (movie_id, user_email)
 );
 
 CREATE INDEX ON ratings(user_email);

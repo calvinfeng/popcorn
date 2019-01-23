@@ -16,6 +16,21 @@ func FetchUserPreference(email string) (*Preference, error) {
 	return pref, nil
 }
 
+// CreateUpdateUserPreference will either create or update a user preference.
+func CreateUpdateUserPreference(email string, val []float64) error {
+	pref, err := FetchUserPreference(email)
+	if err == nil {
+		return db.Model(pref).Update("value", val).Error
+	}
+
+	pref = &Preference{
+		UserEmail: email,
+		Value:     val,
+	}
+
+	return db.Create(pref).Error
+}
+
 // Preference is a user preference for movie.
 type Preference struct {
 	gorm.Model

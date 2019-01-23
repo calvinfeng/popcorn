@@ -1,12 +1,11 @@
 package cmd
 
 import (
-	"fmt"
+	"math/rand"
 	"popcorn/recommender/model"
-	"runtime"
-	"time"
 
 	_ "github.com/jinzhu/gorm/dialects/postgres" // Postgres Driver
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -20,41 +19,18 @@ func Query(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	movies, err := model.FetchAllMovies()
-	if err != nil {
+	pref := make([]float64, 10)
+	for i := 0; i < len(pref); i++ {
+		pref[i] = rand.Float64()
+	}
+
+	if err := model.CreateUpdateUserPreference("cfeng@example.com", pref); err != nil {
 		return err
 	}
 
-	memUsage()
-
-	for i := 0; i < 1000; i++ {
-		time.Sleep(time.Millisecond)
+	if err := model.InsertUserRating("cfeng@example.com", 1, 4.5); err != nil {
+		logrus.Error(err)
 	}
-
-	var count int
-	start := time.Now()
-	for i := 0; i < len(movies); i++ {
-		count++
-	}
-
-	fmt.Printf("pulled %d movies from database\n", count)
-	fmt.Printf("elapsed %s\n", time.Since(start))
 
 	return nil
-}
-
-// MemUsage outputs the current, total and OS memory being used. As well as the number
-// of garage collection cycles completed.
-// For info on each, see: https://golang.org/pkg/runtime/#MemStats
-func memUsage() {
-	var m runtime.MemStats
-	runtime.ReadMemStats(&m)
-	fmt.Printf("Alloc = %v MiB", bToMb(m.Alloc))
-	fmt.Printf("\tTotalAlloc = %v MiB", bToMb(m.TotalAlloc))
-	fmt.Printf("\tSys = %v MiB", bToMb(m.Sys))
-	fmt.Printf("\tNumGC = %v\n", m.NumGC)
-}
-
-func bToMb(b uint64) uint64 {
-	return b / 1024 / 1024
 }

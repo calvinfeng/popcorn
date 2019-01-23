@@ -15,6 +15,17 @@ func FetchUserRatings(email string) ([]*Rating, error) {
 	return ratings, nil
 }
 
+// InsertUserRating inserts a movie rating.
+func InsertUserRating(email string, id MovieID, val float32) error {
+	rating := &Rating{
+		UserEmail: email,
+		MovieID:   id,
+		Value:     val,
+	}
+
+	return db.Create(rating).Error
+}
+
 // Rating is a movie rating submitted by user.
 type Rating struct {
 	gorm.Model

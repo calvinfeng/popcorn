@@ -46,11 +46,16 @@ func (srv *Server) Fetch(ctx context.Context, req *movie.RecommendRequest) (*mov
 			continue
 		}
 
-		if pred > avg {
+		if pred > 2.5 {
 			movieIDs = append(movieIDs, movieID)
+		}
+
+		if len(movieIDs) == 10 {
+			break
 		}
 	}
 
+	fmt.Println(movieIDs)
 	movies, err := model.FetchMovies(movieIDs)
 	if err != nil {
 		return nil, err
