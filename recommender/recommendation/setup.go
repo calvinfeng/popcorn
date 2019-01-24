@@ -1,15 +1,14 @@
 package recommendation
 
 import (
+	"context"
 	"popcorn/recommender/lowrank"
 	"popcorn/recommender/model"
 )
 
-var trainer *lowrank.Trainer
+var jobQueue = make(chan lowrank.TrainingJob)
 
-// InitTrainer pulls all movies from database and initialize a trainer with all the movie features
-// information.
-func InitTrainer() error {
+func RunTrainingGround(ctx context.Context) error {
 	movies, err := model.FetchAllMovies()
 	if err != nil {
 		return err
@@ -24,7 +23,13 @@ func InitTrainer() error {
 		movieLatentMap[movie.ID] = movie.Feature
 	}
 
-	trainer = lowrank.NewTrainer(movieLatentMap)
-
-	return nil
+	for {
+		select {
+		case <-ctx.Done():
+			return nil
+		case job := <-jobQueue:
+			trainer := lowrank.NewTrainer(movieLatentMap)
+			trainer.AssignJob(job)
+		}
+	}
 }

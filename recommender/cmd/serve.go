@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 	"net"
 	"os"
@@ -53,6 +54,9 @@ func Serve(cmd *cobra.Command, args []string) error {
 	// 	}
 	// }()
 
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
 	if err := configureViper(); err != nil {
 		return err
 	}
@@ -71,7 +75,7 @@ func Serve(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	if err := recommendation.InitTrainer(); err != nil {
+	if err := recommendation.RunTrainingGround(ctx); err != nil {
 		return err
 	}
 

@@ -6,6 +6,13 @@ import (
 	"popcorn/recommender/model"
 )
 
+// TrainingJob carries the payload necessary to perform an update on user preference.
+type TrainingJob struct {
+	UserEmail      string
+	UserRatings    map[model.MovieID]float64
+	UserPreference []float64
+}
+
 // NewTrainer returns a trainer with movie latent map intialized.
 func NewTrainer(latents map[model.MovieID][]float64) *Trainer {
 	return &Trainer{
@@ -24,10 +31,10 @@ type Trainer struct {
 	movieLatentMap map[model.MovieID][]float64
 }
 
-// SetUser assigns a user to trainer.
-func (t *Trainer) SetUser(id model.UserID, ratings map[model.MovieID]float64, pref []float64) {
-	t.userRatings = ratings
-	t.userPreference = pref
+// AssignJob assigns a training job to trainer.
+func (t *Trainer) AssignJob(j TrainingJob) {
+	t.userRatings = j.UserRatings
+	t.userPreference = j.UserPreference
 }
 
 // Preference returns an updated preference of a trained user.
