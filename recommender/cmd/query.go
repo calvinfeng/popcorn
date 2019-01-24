@@ -24,7 +24,7 @@ func Query(cmd *cobra.Command, args []string) error {
 		pref[i] = rand.Float64()
 	}
 
-	if err := model.CreateUpdateUserPreference("cfeng@example.com", pref); err != nil {
+	if err := model.InsertUpdateUserPreference("cfeng@example.com", pref); err != nil {
 		return err
 	}
 
