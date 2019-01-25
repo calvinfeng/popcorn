@@ -8,3 +8,7 @@ password = "cfeng"
 hostname = "localhost"
 port = 5432
 ssl_mode = "disable"
+
+
+[data]
+dir = "./datasets/27m"

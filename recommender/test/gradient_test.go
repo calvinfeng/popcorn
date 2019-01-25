@@ -3,17 +3,43 @@ package test
 import (
 	"math"
 	"math/rand"
+	"popcorn/recommender/loader"
 	"popcorn/recommender/lowrank"
 	"testing"
 	"time"
 
+	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 )
 
+func init() {
+	viper.AddConfigPath("../conf")
+	viper.SetConfigName("testing")
+}
+
+func initCSVLoaderForTesting() error {
+	loader.SetDatasetDir(viper.GetString("data.dir"))
+	if err := loader.LoadMovies(); err != nil {
+		return err
+	}
+
+	if err := loader.LoadRatings(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func TestTrainingGradientCalculation(t *testing.T) {
+	err := viper.ReadInConfig()
+	assert.NoError(t, err)
+
+	err = initCSVLoaderForTesting()
+	assert.NoError(t, err)
+
 	rand.Seed(time.Now().Unix())
 
-	f, err := lowrank.NewIterativeFactorizer("../datasets/100k", 10)
+	f, err := lowrank.NewIterativeFactorizer(viper.GetInt("training.feature_dim"))
 	assert.NoError(t, err)
 
 	users := f.Users()

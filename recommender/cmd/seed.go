@@ -12,6 +12,33 @@ import (
 	"github.com/spf13/viper"
 )
 
+func initCSVLoaderForSeeding() error {
+	loader.SetDatasetDir(viper.GetString("data.dir"))
+	if err := loader.LoadMovies(); err != nil {
+		return err
+	}
+
+	if err := loader.LoadMetadata(); err != nil {
+		return err
+	}
+
+	if err := loader.LoadTags(); err != nil {
+		return err
+	}
+
+	if err := loader.LoadRatings(); err != nil {
+		return err
+	}
+
+	if err := loader.LoadFeatures(); err != nil {
+		return err
+	}
+
+	loader.AddRatingStatsToMovies()
+
+	return nil
+}
+
 // Seed inserts data to Postgres.
 func Seed(cmd *cobra.Command, args []string) error {
 	if err := configureViper(); err != nil {
@@ -34,28 +61,9 @@ func Seed(cmd *cobra.Command, args []string) error {
 
 	logrus.Infof("connected to %s", addr)
 
-	loader.SetDatasetDir(viper.GetString("ml.dataset_dir"))
-	if err := loader.LoadMovies(); err != nil {
+	if err := initCSVLoaderForSeeding(); err != nil {
 		return err
 	}
-
-	if err := loader.LoadMetadata(); err != nil {
-		return err
-	}
-
-	if err := loader.LoadTags(); err != nil {
-		return err
-	}
-
-	if err := loader.LoadRatings(); err != nil {
-		return err
-	}
-
-	if err := loader.LoadFeatures(); err != nil {
-		return err
-	}
-
-	loader.AddRatingStatsToMovies()
 
 	movies := loader.Movies()
 	bar := progressbar.New(len(movies))

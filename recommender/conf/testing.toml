@@ -1,5 +1,5 @@
 [data]
-dir = "./datasets/27m"
+dir = "../datasets/100k"
 
 [data.filter]
 min_ratings_per_user = 50
