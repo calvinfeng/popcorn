@@ -151,7 +151,7 @@ func (f *IterativeFactorizer) Train(N, epochSize int, reg, learnRate float64) er
 				return err
 			}
 
-			logrus.Infof("%3d/%d loss = %5.2f & rmse = %1.8f", i, N, loss, rmse)
+			logrus.Infof("%3d/%3d loss = %5.2f & rmse = %1.8f", i, N, loss, rmse)
 		}
 
 		start := time.Now()
@@ -186,7 +186,7 @@ func (f *IterativeFactorizer) Train(N, epochSize int, reg, learnRate float64) er
 			}
 		}
 
-		logrus.Printf("%d/%d elapsed time: %s\n", i, N, time.Since(start))
+		logrus.Printf("per training elapsed time: %s\n", time.Since(start))
 	}
 
 	return nil

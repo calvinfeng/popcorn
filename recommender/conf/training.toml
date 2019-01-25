@@ -5,8 +5,8 @@ dir = "./datasets/27m"
 min_ratings_per_user = 50
 
 [training]
-num_steps = 100
-epoch_size = 10
+num_steps = 1000
+epoch_size = 50
 feature_dim = 10
-regularization = 0.05
-learning_rate = 0.00001
+regularization = 5e-2
+learning_rate = 2e-5
