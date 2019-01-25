@@ -24,3 +24,8 @@ func ConnectDB() (err error) {
 
 	return
 }
+
+// IsDatabaseConnected checks if model package has already connected to database.
+func IsDatabaseConnected() bool {
+	return db != nil
+}

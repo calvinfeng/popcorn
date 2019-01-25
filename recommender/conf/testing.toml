@@ -1,0 +1,12 @@
+[data]
+dir = "../datasets/100k"
+
+[data.filter]
+min_ratings_per_user = 50
+
+[training]
+num_steps = 100
+epoch_size = 10
+feature_dim = 10
+regularization = 0.05
+learning_rate = 0.00001

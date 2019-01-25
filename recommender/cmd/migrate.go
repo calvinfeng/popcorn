@@ -55,21 +55,22 @@ func Migrate(cmd *cobra.Command, args []string) error {
 	switch args[0] {
 	case up:
 		logrus.Infof("migrating database %s to latest version", addr)
-		err = migration.Up()
-	case reset:
-		logrus.Warnf("resetting database %s, all data will be lost", addr)
-		err = migration.Drop()
-	default:
-		return fmt.Errorf("%s is not a valid command", args[0])
-	}
-
-	if err != nil {
-		switch err {
-		case migrate.ErrNoChange:
+		if err := migration.Up(); err != nil && err == migrate.ErrNoChange {
 			logrus.Warn(err)
-		default:
+		} else if err != nil {
 			return err
 		}
+
+		logrus.Info("database is now up to date")
+	case reset:
+		logrus.Warnf("resetting database %s, all data will be lost", addr)
+		if err = migration.Drop(); err != nil {
+			return err
+		}
+
+		logrus.Info("database has been reset")
+	default:
+		return fmt.Errorf("%s is not a valid command", args[0])
 	}
 
 	return nil

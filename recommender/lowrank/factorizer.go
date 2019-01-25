@@ -1,7 +1,6 @@
 package lowrank
 
 import (
-	"fmt"
 	"math"
 	"math/rand"
 	"popcorn/recommender/loader"
@@ -12,17 +11,7 @@ import (
 )
 
 // NewIterativeFactorizer returns a new instance of iterative factorizer.
-func NewIterativeFactorizer(dir string, K int) (*IterativeFactorizer, error) {
-	loader.SetDatasetDir(dir)
-
-	if err := loader.LoadMovies(); err != nil {
-		return nil, err
-	}
-
-	if err := loader.LoadRatings(); err != nil {
-		return nil, err
-	}
-
+func NewIterativeFactorizer(K int) (*IterativeFactorizer, error) {
 	f := &IterativeFactorizer{
 		userLatentMap:  make(map[model.UserID][]float64),
 		movieLatentMap: make(map[model.MovieID][]float64),
@@ -154,15 +143,15 @@ func (f *IterativeFactorizer) Loss(reg float64) (loss, rmse float64, err error) 
 }
 
 // Train performs gradient descent training on latent vectors of users and movies.
-func (f *IterativeFactorizer) Train(steps, epoch int, reg, learnRate float64) error {
-	for i := 0; i < steps; i++ {
-		if i%epoch == 0 {
+func (f *IterativeFactorizer) Train(N, epochSize int, reg, learnRate float64) error {
+	for i := 0; i < N; i++ {
+		if i%epochSize == 0 {
 			loss, rmse, err := f.Loss(reg)
 			if err != nil {
 				return err
 			}
 
-			logrus.Infof("%3d/%d loss = %5.2f & rmse = %1.8f", i, steps, loss, rmse)
+			logrus.Infof("%3d/%3d loss = %5.2f & rmse = %1.8f", i, N, loss, rmse)
 		}
 
 		start := time.Now()
@@ -197,7 +186,7 @@ func (f *IterativeFactorizer) Train(steps, epoch int, reg, learnRate float64) er
 			}
 		}
 
-		fmt.Printf("%d/%d elapsed time: %s\n", i, steps, time.Since(start))
+		logrus.Printf("per training elapsed time: %s\n", time.Since(start))
 	}
 
 	return nil
