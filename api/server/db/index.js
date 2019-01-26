@@ -1,12 +1,8 @@
+const config = require('config');
 const { Pool } = require('pg')
 
-const pool = new Pool({
-  user: 'popcorn',
-  host: 'localhost',
-  database: 'popcorn',
-  password: 'popcorn',
-  port: 5432,
-})
+const dbConfig = config.get('Postgres.dbConfig');
+const pool = new Pool(dbConfig)
 
 pool.on('error', (err, client) => {
   console.error('Unexpected error on idle client', err)
