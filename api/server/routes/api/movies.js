@@ -1,3 +1,4 @@
+const config = require('config');
 const router = require('express').Router();
 const { schema } = require('../schema/movies');
 const validate = require('express-validation');
@@ -9,7 +10,7 @@ router.param('imdbId', validate(schema.getMovie));
 router.get('/details/:imdbId', async (req, res) => {
   const client = await pool.connect();
   const imdbId = req.params.imdbId;
-  const apiKey = '2afddf218bfb5d06ef460cc103af69bc'
+  const apiKey = config.get('MovieDB.apiKey');
   try {
     // pool.query returns an object with a key called row. The value is an array of requested sql row(s).
     const { rows } = await pool.query('SELECT * From movie_details WHERE imdb_id = $1', [imdbId]);

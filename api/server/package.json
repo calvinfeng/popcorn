@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "NODE_ENV=development node app.js"
   },
   "keywords": [],
   "author": "",
@@ -19,6 +19,7 @@
     "grpc": "^1.17.0",
     "joi": "^14.3.1",
     "morgan": "^1.9.1",
+    "node-config": "0.0.2",
     "pg": "^7.8.0",
     "winston": "^3.1.0"
   }

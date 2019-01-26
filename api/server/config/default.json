@@ -1,0 +1,14 @@
+{
+  "Postgres": {
+    "dbConfig": {
+      "name": "",
+      "user": "",
+      "password": "",
+      "hostname": "localhost",
+      "port": 5432
+    }
+  },
+  "MovieDB": {
+    "apiKey": ""
+  }  
+}
