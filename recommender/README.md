@@ -35,11 +35,11 @@ CREATE DATABASE popcorn with OWNER=popcorn;
 
 ### Run migration
 
-    recommender migrate up
+    recommender migrate
 
-### Reset database
+### Drop database
 
-    recommender migrate reset
+    recommender dropdb
 
 ### Seed
 

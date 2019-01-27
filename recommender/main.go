@@ -36,6 +36,11 @@ func main() {
 			RunE:  cmd.Migrate,
 		},
 		&cobra.Command{
+			Short: "Drop all data and tables on PostgreSQL",
+			Use:   "dropdb",
+			RunE:  cmd.DropDB,
+		},
+		&cobra.Command{
 			Short: "Run an example query",
 			Use:   "query",
 			RunE:  cmd.Query,
