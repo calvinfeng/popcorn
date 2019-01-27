@@ -9,11 +9,18 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+var userLatentDim = 10
+
+// SetUserLatentDim sets the dimension of user latent vector.
+func SetUserLatentDim(k int) {
+	userLatentDim = k
+}
+
 // JobQueue is a queue for personalized training.
 var JobQueue = make(chan lowrank.TrainerJob)
 
-// RunTrainingGround kicks off a goroutine to listen for new training job.
-func RunTrainingGround(ctx context.Context) error {
+// ProcessJob processes new training job from job queue.
+func ProcessJob(ctx context.Context) error {
 	movies, err := model.FetchAllMovies()
 	if err != nil {
 		return err

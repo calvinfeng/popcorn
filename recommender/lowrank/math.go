@@ -9,6 +9,31 @@ import (
 	"gonum.org/v1/gonum/mat"
 )
 
+// RandVector creates a random float64 value of K length.
+func RandVector(K int) []float64 {
+	vector := make([]float64, K)
+	for k := 0; k < K; k++ {
+		vector[k] = rand.Float64()
+	}
+
+	return vector
+}
+
+// DotProduct computes the dot product of two vector. The function will return an error if the two
+// vectors are not the same length.
+func DotProduct(vector1 []float64, vector2 []float64) (float64, error) {
+	var sum float64
+	if len(vector1) != len(vector2) {
+		return sum, errors.New("dimension mismatch")
+	}
+
+	for i := 0; i < len(vector1); i++ {
+		sum += vector1[i] * vector2[i]
+	}
+
+	return sum, nil
+}
+
 func randMat(row, col int) *mat.Dense {
 	rand.Seed(time.Now().UTC().Unix())
 
@@ -58,26 +83,4 @@ func absAverage(M *mat.Dense) float64 {
 	}
 
 	return sum / float64(I*J)
-}
-
-func dotProduct(vector1 []float64, vector2 []float64) (float64, error) {
-	var sum float64
-	if len(vector1) != len(vector2) {
-		return sum, errors.New("dimension mismatch")
-	}
-
-	for i := 0; i < len(vector1); i++ {
-		sum += vector1[i] * vector2[i]
-	}
-
-	return sum, nil
-}
-
-func randVector(K int) []float64 {
-	vector := make([]float64, K)
-	for k := 0; k < K; k++ {
-		vector[k] = rand.Float64()
-	}
-
-	return vector
 }

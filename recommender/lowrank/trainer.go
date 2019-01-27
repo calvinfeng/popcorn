@@ -95,7 +95,7 @@ func (t *Trainer) Loss() (loss float64, err error) {
 		}
 
 		var pred float64
-		pred, err = dotProduct(t.userPreference, t.movieLatentMap[movieID])
+		pred, err = DotProduct(t.userPreference, t.movieLatentMap[movieID])
 		if err != nil {
 			return
 		}
@@ -125,7 +125,7 @@ func (t *Trainer) userLatentGradient(reg float64) ([]float64, error) {
 				continue
 			}
 
-			pred, err := dotProduct(t.userPreference, t.movieLatentMap[movieID])
+			pred, err := DotProduct(t.userPreference, t.movieLatentMap[movieID])
 			if err != nil {
 				return nil, err
 			}

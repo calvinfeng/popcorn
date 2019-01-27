@@ -31,7 +31,7 @@ func TestLowRankTrainer(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	go recommendation.RunTrainingGround(ctx)
+	go recommendation.ProcessJob(ctx)
 
 	movies, err := model.FetchAllMovies()
 	assert.NoError(t, err)

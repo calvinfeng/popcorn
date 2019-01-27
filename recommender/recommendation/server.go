@@ -2,8 +2,8 @@ package recommendation
 
 import (
 	"context"
-	"errors"
 	"fmt"
+	"popcorn/recommender/lowrank"
 	"popcorn/recommender/model"
 	"popcorn/recommender/pb/movie"
 
@@ -40,7 +40,7 @@ func (srv *Server) Fetch(ctx context.Context, req *movie.RecommendRequest) (*mov
 
 	movieIDs := []model.MovieID{}
 	for movieID, feature := range movieFeatureStore {
-		pred, err := dotProduct(pref.Value, feature)
+		pred, err := lowrank.DotProduct(pref.Value, feature)
 		if err != nil {
 			logrus.Error(err)
 			continue
@@ -75,18 +75,47 @@ func (srv *Server) Fetch(ctx context.Context, req *movie.RecommendRequest) (*mov
 
 // UpdateUserPreference queues a training task.
 func (srv *Server) UpdateUserPreference(ctx context.Context, req *movie.UpdateRequest) (*movie.UpdateResponse, error) {
+	var latent []float64
+
+	pref, err := model.FetchUserPreference(req.UserEmail)
+	if err == nil {
+		latent = pref.Value
+	} else {
+		latent = lowrank.RandVector(userLatentDim)
+	}
+
+	ratings, err := model.FetchUserRatings(req.UserEmail)
+	if err != nil {
+		return nil, err
+	}
+
+	ratingMap := make(map[model.MovieID]float64)
+	for _, r := range ratings {
+		ratingMap[r.MovieID] = float64(r.Value)
+	}
+
+	ch := make(chan lowrank.TrainerResponse)
+	JobQueue <- lowrank.TrainerJob{
+		UserEmail:      req.UserEmail,
+		UserRatings:    ratingMap,
+		UserPreference: latent,
+		Response:       ch,
+	}
+
+	go handleResponse(req.UserEmail, ch)
+
 	return &movie.UpdateResponse{Accepted: true}, nil
 }
 
-func dotProduct(v, u []float64) (product float64, err error) {
-	if len(v) != len(u) {
-		err = errors.New("vectors are different length")
+func handleResponse(email string, ch <-chan lowrank.TrainerResponse) {
+	resp := <-ch
+	logrus.Infof("received trainer response for user %s", email)
+	if resp.FinalLoss >= resp.InitLoss {
+		logrus.Warn("training is not successful, final loss is greater than initial loss")
 		return
 	}
 
-	for i := 0; i < len(v); i++ {
-		product += v[i] * u[i]
+	if err := model.InsertUpdateUserPreference(email, resp.Preference); err != nil {
+		logrus.Error(err)
 	}
-
-	return
 }
