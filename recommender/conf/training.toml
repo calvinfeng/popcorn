@@ -4,7 +4,7 @@ dir = "./datasets/27m"
 [data.filter]
 min_ratings_per_user = 50
 
-[training]
+[model_training]
 num_steps = 1000
 epoch_size = 50
 feature_dim = 10

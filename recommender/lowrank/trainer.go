@@ -6,11 +6,40 @@ import (
 	"popcorn/recommender/model"
 )
 
-// TrainingJob carries the payload necessary to perform an update on user preference.
-type TrainingJob struct {
+// UpdateTrainerConfig is a setter for the local configuration variable.
+func UpdateTrainerConfig(steps int, reg, learnRate float64) {
+	cfg.Steps = steps
+	cfg.Regularization = reg
+	cfg.LearningRate = learnRate
+}
+
+// Default configuration value
+var cfg = TrainerConfig{
+	Steps:          1000,
+	Regularization: 0.05,
+	LearningRate:   2e-5,
+}
+
+// TrainerConfig configures the training hyperparamter for a trainer.
+type TrainerConfig struct {
+	Steps          int
+	Regularization float64
+	LearningRate   float64
+}
+
+// TrainerJob carries the payload necessary to perform an update on user preference.
+type TrainerJob struct {
 	UserEmail      string
 	UserRatings    map[model.MovieID]float64
 	UserPreference []float64
+	Response       chan TrainerResponse
+}
+
+// TrainerResponse reports the training result from a trainer.
+type TrainerResponse struct {
+	InitLoss   float64
+	FinalLoss  float64
+	Preference []float64
 }
 
 // NewTrainer returns a trainer with movie latent map intialized.
@@ -32,7 +61,7 @@ type Trainer struct {
 }
 
 // AssignJob assigns a training job to trainer.
-func (t *Trainer) AssignJob(j TrainingJob) {
+func (t *Trainer) AssignJob(j TrainerJob) {
 	t.userRatings = j.UserRatings
 	t.userPreference = j.UserPreference
 }
@@ -43,22 +72,23 @@ func (t *Trainer) Preference() []float64 {
 }
 
 // Train performs training on a user.
-func (t *Trainer) Train(steps int, reg, learnRate float64) error {
-	for i := 0; i < steps; i++ {
-		grad, err := t.userLatentGradient(reg)
+func (t *Trainer) Train() error {
+	for i := 0; i < cfg.Steps; i++ {
+		grad, err := t.userLatentGradient(cfg.Regularization)
 		if err != nil {
 			return err
 		}
 
 		for k := 0; k < len(t.userPreference); k++ {
-			t.userPreference[k] -= learnRate * grad[k]
+			t.userPreference[k] -= cfg.LearningRate * grad[k]
 		}
 	}
 	return nil
 }
 
 // Loss returns the current loss.
-func (t *Trainer) Loss(reg float64) (loss float64, err error) {
+func (t *Trainer) Loss() (loss float64, err error) {
+	var count int
 	for movieID := range t.userRatings {
 		if _, ok := t.movieLatentMap[movieID]; !ok {
 			continue
@@ -71,6 +101,13 @@ func (t *Trainer) Loss(reg float64) (loss float64, err error) {
 		}
 
 		loss += 0.5 * math.Pow(t.userRatings[movieID]-pred, 2)
+		count++
+	}
+
+	loss /= float64(count)
+
+	for _, val := range t.userPreference {
+		loss += 0.5 * cfg.Regularization * math.Pow(val, 2)
 	}
 
 	return

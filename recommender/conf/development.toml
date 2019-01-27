@@ -11,3 +11,9 @@ ssl_mode = "disable"
 
 [data]
 dir = "./datasets/100k"
+
+[personalized_training]
+num_steps = 1000
+feature_dim = 10
+regularization = 0.05
+learning_rate = 2e-5

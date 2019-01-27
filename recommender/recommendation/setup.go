@@ -9,12 +9,8 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-var jobQueue = make(chan lowrank.TrainingJob)
-
-// TODO: Make this a config
-var trainingSteps = 1000
-var regularization = 0.05
-var learnRate = 0.00001
+// JobQueue is a queue for personalized training.
+var JobQueue = make(chan lowrank.TrainerJob)
 
 // RunTrainingGround kicks off a goroutine to listen for new training job.
 func RunTrainingGround(ctx context.Context) error {
@@ -36,12 +32,19 @@ func RunTrainingGround(ctx context.Context) error {
 		select {
 		case <-ctx.Done():
 			return nil
-		case job := <-jobQueue:
+		case job := <-JobQueue:
 			trainer := lowrank.NewTrainer(movieLatentMap)
 			trainer.AssignJob(job)
 
 			go func(t *lowrank.Trainer) {
-				if err := t.Train(trainingSteps, regularization, learnRate); err != nil {
+				initLoss, err := t.Loss()
+				if err != nil {
+					logrus.Error(err)
+					return
+				}
+
+				err = t.Train()
+				if err != nil {
 					logrus.Error(err)
 					return
 				}
@@ -54,8 +57,16 @@ func RunTrainingGround(ctx context.Context) error {
 					}
 				}
 
-				if err := model.InsertUpdateUserPreference(job.UserEmail, t.Preference()); err != nil {
+				finalLoss, err := t.Loss()
+				if err != nil {
 					logrus.Error(err)
+					return
+				}
+
+				job.Response <- lowrank.TrainerResponse{
+					InitLoss:   initLoss,
+					FinalLoss:  finalLoss,
+					Preference: t.Preference(),
 				}
 			}(trainer)
 		}

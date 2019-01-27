@@ -1,13 +1,14 @@
 package test
 
 import (
+	"io/ioutil"
 	"math"
 	"math/rand"
 	"popcorn/recommender/loader"
 	"popcorn/recommender/lowrank"
 	"testing"
-	"time"
 
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 )
@@ -15,6 +16,7 @@ import (
 func init() {
 	viper.AddConfigPath("../conf")
 	viper.SetConfigName("testing")
+	logrus.SetOutput(ioutil.Discard)
 }
 
 func initCSVLoaderForTesting() error {
@@ -37,9 +39,9 @@ func TestTrainingGradientCalculation(t *testing.T) {
 	err = initCSVLoaderForTesting()
 	assert.NoError(t, err)
 
-	rand.Seed(time.Now().Unix())
+	rand.Seed(0)
 
-	f, err := lowrank.NewIterativeFactorizer(viper.GetInt("training.feature_dim"))
+	f, err := lowrank.NewIterativeFactorizer(viper.GetInt("model_training.feature_dim"))
 	assert.NoError(t, err)
 
 	users := f.Users()

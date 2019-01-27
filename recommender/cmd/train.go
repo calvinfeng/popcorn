@@ -33,7 +33,7 @@ func Train(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	K := viper.GetInt("training.feature_dim")
+	K := viper.GetInt("model_training.feature_dim")
 
 	lowrank.SetMinRatingsPerUser(viper.GetInt("data.filter.min_ratings_per_user"))
 	f, err := lowrank.NewIterativeFactorizer(K)
@@ -42,10 +42,10 @@ func Train(cmd *cobra.Command, args []string) error {
 	}
 
 	err = f.Train(
-		viper.GetInt("training.num_steps"),
-		viper.GetInt("training.epoch_size"),
-		viper.GetFloat64("training.regularization"),
-		viper.GetFloat64("training.learning_rate"),
+		viper.GetInt("model_training.num_steps"),
+		viper.GetInt("model_training.epoch_size"),
+		viper.GetFloat64("model_training.regularization"),
+		viper.GetFloat64("model_training.learning_rate"),
 	)
 
 	if err != nil {
