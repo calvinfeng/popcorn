@@ -1,10 +1,9 @@
 const express = require('express');
 const morgan = require('morgan');
-// const userAuthentication = require('./middleware/auth');
+const { timedMovieShuffler, shuffleMovieList } = require('./services/movies');
+const userAuthentication = require('./middleware/auth');
 const newGRPCMiddleware = require('./middleware/grpc');
 const { log, newLogMiddleware } = require('./middleware/logging');
-const cache = require('memory-cache');
-const { pool } = require('./db');
 
 function main() {
   const app = express(); 
@@ -22,15 +21,10 @@ function main() {
 
   try {
     shuffleMovieList();
+    timedMovieShuffler();
   } catch(err) {
     process.exit(1);
   }
-
-  setInterval(() => { 
-    const previousMovieList = cache.get('movieList');
-    const newMovieList = shuffle(previousMovieList);
-    cache.put('movieList', newMovieList);
-  }, 10000);
 
   app.use(morgan(':date[iso] :http-version :method :url => :response-time ms'));
   app.use(express.static('public'));
@@ -46,41 +40,3 @@ function main() {
 
 main();
 
-async function shuffleMovieList() {
-  const client = await pool.connect();
-  try {
-    const result = await pool.query('SELECT id FROM movies');
-
-    const movieIds = [];
-    for (let idx in result.rows){
-      movieIds.push(result.rows[idx].id);
-    }
-
-    cache.put('movieList', shuffle(movieIds));
-  } catch(err) {
-    console.log(`Failed to get movies from database: ${err}`);
-  } finally {
-    client.release();
-  }
-}
-
-function shuffle(array) {
-  let currentIndex = array.length;
-  let temporaryValue = 0;
-  let randomIndex = 0;
-
-  // While there remain elements to shuffle...
-  while (0 !== currentIndex) {
-
-    // Pick a remaining element...
-    randomIndex = Math.floor(Math.random() * currentIndex);
-    currentIndex -= 1;
-
-    // And swap it with the current element.
-    temporaryValue = array[currentIndex];
-    array[currentIndex] = array[randomIndex];
-    array[randomIndex] = temporaryValue;
-  }
-
-  return array;
-}
