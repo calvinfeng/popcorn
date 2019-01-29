@@ -1,6 +1,7 @@
 const express = require('express');
 const morgan = require('morgan');
-// const userAuthentication = require('./middleware/auth');
+const { timedMovieShuffler, shuffleMovieList } = require('./services/movies');
+const userAuthentication = require('./middleware/auth');
 const newGRPCMiddleware = require('./middleware/grpc');
 const { log, newLogMiddleware } = require('./middleware/logging');
 
@@ -18,6 +19,13 @@ function main() {
     });
   }
 
+  try {
+    shuffleMovieList();
+    timedMovieShuffler();
+  } catch(err) {
+    process.exit(1);
+  }
+
   app.use(morgan(':date[iso] :http-version :method :url => :response-time ms'));
   app.use(express.static('public'));
   app.use(express.json())
@@ -31,5 +39,4 @@ function main() {
 }
 
 main();
-
 

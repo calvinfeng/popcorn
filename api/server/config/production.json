@@ -1,7 +1,7 @@
 {
   "Postgres": {
     "dbConfig": {
-      "name": "popcorn",
+      "database": "popcorn",
       "user": "cfeng",
       "password": "cfeng",
       "hostname": "localhost",
@@ -13,5 +13,8 @@
   },
   "GoogleOAuth": {
     "clientId": "1098793859190-mg296rsi3udk6il3qttma3ub9k6dp49b.apps.googleusercontent.com"
-  } 
+  },
+  "MovieList": {
+    "RandomizeTimer": 3600000
+  }
 }
