@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/golang-migrate/migrate"
@@ -13,32 +12,8 @@ import (
 	"github.com/spf13/viper"
 )
 
-const (
-	dir   = "file://./migrations/"
-	up    = "up"
-	reset = "reset"
-)
-
-const usage = `
-Commands:
-	up     Migrate the DB to the most recent version available
-	reset  Resets the database
-Usage:
-	userauth migrate <command>
-`
-
-// Migrate runs migration on a PostgreSQL database.
-func Migrate(cmd *cobra.Command, args []string) error {
-	if len(args) == 0 {
-		fmt.Println(usage)
-		return errors.New("no commands provided")
-	}
-
-	if err := configureViper(); err != nil {
-		return err
-	}
-
-	addr := fmt.Sprintf("postgresql://%s:%s@%s:%d/%s?sslmode=%s",
+func pgAddress() string {
+	return fmt.Sprintf("postgresql://%s:%s@%s:%d/%s?sslmode=%s",
 		viper.GetString("database.user"),
 		viper.GetString("database.password"),
 		viper.GetString("database.hostname"),
@@ -46,32 +21,29 @@ func Migrate(cmd *cobra.Command, args []string) error {
 		viper.GetString("database.name"),
 		viper.GetString("database.ssl_mode"),
 	)
+}
 
-	migration, err := migrate.New(dir, addr)
+const dir = "file://./migrations/"
+
+// Migrate runs migration on a PostgreSQL database.
+func Migrate(cmd *cobra.Command, args []string) error {
+	if err := configureViper(); err != nil {
+		return err
+	}
+
+	addr := pgAddress()
+	migration, err := migrate.New(dir, pgAddress())
 	if err != nil {
 		return err
 	}
 
-	switch args[0] {
-	case up:
-		logrus.Infof("migrating database %s to latest version", addr)
-		if err := migration.Up(); err != nil && err == migrate.ErrNoChange {
-			logrus.Warn(err)
-		} else if err != nil {
-			return err
-		}
-
-		logrus.Info("database is now up to date")
-	case reset:
-		logrus.Warnf("resetting database %s, all data will be lost", addr)
-		if err = migration.Drop(); err != nil {
-			return err
-		}
-
-		logrus.Info("database has been reset")
-	default:
-		return fmt.Errorf("%s is not a valid command", args[0])
+	if err := migration.Up(); err != nil && err == migrate.ErrNoChange {
+		logrus.Warn(err)
+	} else if err != nil {
+		return err
 	}
+
+	logrus.Infof("%s has migrated to latest version", addr)
 
 	return nil
 }

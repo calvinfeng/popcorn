@@ -1,10 +1,10 @@
-# Pop
+# Popcorn
 
 Officially developing Popcorn 2.0.
 
 ## Architecture
 
-Docker, Golang, TypeScript, Node.js, PostgreSQL
+Docker, Golang, TypeScript, Node.js, PostgreSQL, gRPC
 
 ### Requirements
 
@@ -27,11 +27,11 @@ and JavaScript.
 
 ### API
 
-You need to run `npm install` before you run `node index.js`
+[README](./api/README.md)
 
 ### Recommender
 
-Simply run `go install && recommender`, we don't need `dep ensure` anymore.
+[README](./recommender/README.md)
 
 ## Deployment Guide
 

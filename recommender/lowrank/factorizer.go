@@ -24,13 +24,13 @@ func NewIterativeFactorizer(K int) (*IterativeFactorizer, error) {
 
 	ratings := loader.RatingsFilteredByCount(minRatingsPerUser)
 	for userID := range ratings {
-		f.userLatentMap[userID] = randVector(K)
+		f.userLatentMap[userID] = RandVector(K)
 		f.userRating[userID] = make(map[model.MovieID]float64)
 		f.testSet[userID] = make(map[model.MovieID]float64)
 
 		for movieID := range ratings[userID] {
 			if _, ok := f.movieLatentMap[movieID]; !ok {
-				f.movieLatentMap[movieID] = randVector(K)
+				f.movieLatentMap[movieID] = RandVector(K)
 				f.movieRating[movieID] = make(map[model.UserID]float64)
 			}
 
@@ -101,7 +101,7 @@ func (f *IterativeFactorizer) Loss(reg float64) (loss, rmse float64, err error) 
 		for movieID := range f.userRating[userID] {
 			v := f.movieLatentMap[movieID]
 
-			pred, err := dotProduct(u, v)
+			pred, err := DotProduct(u, v)
 			if err != nil {
 				return loss, rmse, err
 			}
@@ -127,7 +127,7 @@ func (f *IterativeFactorizer) Loss(reg float64) (loss, rmse float64, err error) 
 	var count int
 	for userID := range f.testSet {
 		for movieID := range f.testSet[userID] {
-			pred, err := dotProduct(f.userLatentMap[userID], f.movieLatentMap[movieID])
+			pred, err := DotProduct(f.userLatentMap[userID], f.movieLatentMap[movieID])
 			if err != nil {
 				return loss, rmse, err
 			}
@@ -198,7 +198,7 @@ func (f *IterativeFactorizer) userLatentGradient(id model.UserID, reg float64) (
 	grad := make([]float64, len(latent))
 	for k := 0; k < len(latent); k++ {
 		for movieID := range f.userRating[id] {
-			pred, err := dotProduct(latent, f.movieLatentMap[movieID])
+			pred, err := DotProduct(latent, f.movieLatentMap[movieID])
 			if err != nil {
 				return nil, err
 			}
@@ -218,7 +218,7 @@ func (f *IterativeFactorizer) movieLatentGradient(id model.MovieID, reg float64)
 	grad := make([]float64, len(latent))
 	for k := 0; k < len(latent); k++ {
 		for userID := range f.movieRating[id] {
-			pred, err := dotProduct(latent, f.userLatentMap[userID])
+			pred, err := DotProduct(latent, f.userLatentMap[userID])
 			if err != nil {
 				return nil, err
 			}

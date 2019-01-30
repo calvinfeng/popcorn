@@ -38,9 +38,7 @@ func Serve(cmd *cobra.Command, args []string) error {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	if err := recommendation.RunTrainingGround(ctx); err != nil {
-		return err
-	}
+	go recommendation.ProcessJob(ctx)
 
 	srv := grpc.NewServer()
 	pbmovie.RegisterRecommendationServer(srv, &recommendation.Server{})
