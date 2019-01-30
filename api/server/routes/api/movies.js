@@ -4,9 +4,13 @@ const { schema } = require('../schema/movies');
 const validate = require('express-validation');
 const { pool } = require('../../db');
 const axios = require('axios');
+const cache = require('memory-cache');
 
 router.param('imdbId', validate(schema.getMovie));
 
+/**
+ * Get a movie detail
+ */
 router.get('/details/:imdbId', async (req, res) => {
   let client; 
   const imdbId = req.params.imdbId;
@@ -31,7 +35,6 @@ router.get('/details/:imdbId', async (req, res) => {
         const status = error.response.status;
         const message = `The movie with the given IMDB ID ${imdbId} was not found: ${err}`;
         
-        res.setHeader('Content-Type', 'application/json');
         res.status(status).send(message);
       }
     } else {
@@ -47,6 +50,9 @@ router.get('/details/:imdbId', async (req, res) => {
   }
 });
 
+/**
+ * Get a movie
+ */
 router.get('/:imdbId', async (req, res) => {
   let client;
   const imdbId = req.params.imdbId;
@@ -58,8 +64,7 @@ router.get('/:imdbId', async (req, res) => {
     res.setHeader('Content-Type', 'application/json');
     res.status(200).send(movie);
   }
-  catch {
-    res.setHeader('Content-Type', 'application/json');
+  catch(err) {
     res.status(404).send(`The movie with the given IMDB ID ${imdbId} was not found: ${err}`)
   }
   finally {
@@ -67,44 +72,33 @@ router.get('/:imdbId', async (req, res) => {
   }
 });
 
-router.get('/page/', async (req, res) => {
+/**
+ * Get movies by page number
+ */
+// TODO: validation for query?
+router.get('/list', async (req, res) => {
   let client;
-  try {
-    client = await pool.connect();
-  }
-  catch {
-    res.setHeader('Content-Type', 'application/json');
-    res.status(404).send(`The page was not found: ${err}`
-  }
-  finally {
-    client.release();
-  }
-})
+  const pageNumber = parseInt(req.query.page);
 
-router.post('/rate/:imdbId', async (req, res) => {
-  let client;
-  const imdbId = req.params.imdbId;
-  try {
-    client = await pool.connect();
+  if (pageNumber < 0 || pageNumber === 0) {
+    res.status(404).send(`The page was not found.`)
   }
-  catch {
-    res.setHeader('Content-Type', 'application/json');
-    res.status(404).send(`The movie with the given IMDB ID ${imdbId} was not found: ${err}`)
-  }
-  finally {
-    client.release();
-  }
-})
+  const startIdx = 20 * (pageNumber - 1);
+  const endIdx = (20 * pageNumber) - 1;
+  const movieIdList = cache.get('movieList')
+                           .slice(startIdx, endIdx)
+                           .join(', ');
 
-router.put('/rate/:imdbId', async (req, res) => {
-  let client;
-  const imdbId = req.params.imdbId;
   try {
     client = await pool.connect();
-  }
-  catch {
+    const { rows } = await pool.query(`SELECT * from movies WHERE imdb_id in (${movieIdList})`);
+    const movieList = rows;
+
     res.setHeader('Content-Type', 'application/json');
-    res.status(404).send(`The movie with the given IMDB ID ${imdbId} was not found: ${err}`
+    res.status(200).send(movieList); // TODO: returns an array do we want that?
+  }
+  catch(err) {
+    res.status(404).send(`The page was not found: ${err}`)
   }
   finally {
     client.release();
