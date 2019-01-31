@@ -76,26 +76,27 @@ router.get('/:imdbId', async (req, res) => {
  * Get movies by page number
  */
 // TODO: validation for query?
-router.get('/list', async (req, res) => {
+router.get('/', async (req, res) => {
   let client;
   const pageNumber = parseInt(req.query.page);
+  let movieIdList = cache.get('movieList');
 
-  if (pageNumber < 0 || pageNumber === 0) {
+  if (pageNumber <= 0 || pageNumber > Math.round(movieIdList.length / 20)) {
     res.status(404).send(`The page was not found.`)
+    return;
   }
+  
   const startIdx = 20 * (pageNumber - 1);
-  const endIdx = (20 * pageNumber) - 1;
-  const movieIdList = cache.get('movieList')
-                           .slice(startIdx, endIdx)
-                           .join(', ');
+  const endIdx = (20 * pageNumber);
+  movieIdList = movieIdList.slice(startIdx, endIdx)
+                           .join(',');
 
   try {
     client = await pool.connect();
-    const { rows } = await pool.query(`SELECT * from movies WHERE imdb_id in (${movieIdList})`);
-    const movieList = rows;
+    const { rows } = await pool.query(`SELECT * from movies WHERE id in (${movieIdList})`);
 
     res.setHeader('Content-Type', 'application/json');
-    res.status(200).send(movieList); // TODO: returns an array do we want that?
+    res.status(200).send(rows); // TODO: returns an array of movies, do we want that?
   }
   catch(err) {
     res.status(404).send(`The page was not found: ${err}`)
