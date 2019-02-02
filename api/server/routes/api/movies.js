@@ -1,32 +1,33 @@
-const config = require('config');
-const router = require('express').Router();
-const { moviesSchema } = require('../schema/movies');
-const validate = require('express-validation');
-const { pool } = require('../../db');
 const axios = require('axios');
 const cache = require('memory-cache');
-
+const config = require('config');
+const router = require('express').Router();
+const validate = require('express-validation');
+const { moviesSchema } = require('../schema/movies');
+const { pool } = require('../../db');
 
 /**
  * Get a movie detail
  */
 router.get('/details/:imdbId', validate(moviesSchema.validateImdbId), async (req, res) => {
-  console.log('hello')
   let client; 
   const imdbId = req.params.imdbId;
   const apiKey = config.get('MovieDB.apiKey');
+
   try {
     client = await pool.connect();
     // pool.query returns an object with a key called row. The value is an array of requested sql row(s).
     const { rows } = await pool.query('SELECT * From movie_details WHERE imdb_id = $1', [imdbId]);
+    
     let movieDetail = rows[0];
-
     if ( !movieDetail ) {
       // If record is not found, make a request to The Movie Database and retrieve data.
       try {
         const tmdbRes = await axios.get(`https://api.themoviedb.org/3/movie/${imdbId}?api_key=${apiKey}`);
+        
         const date = new Date();
-        await pool.query('INSERT INTO movie_details (imdb_id, created_at, updated_at, detail) VALUES ($1, $2, $3, $4)', [imdbId, date, date, tmdbRes.data]);
+        await pool.query('INSERT INTO movie_details (imdb_id, created_at, updated_at, detail) VALUES ($1, $2, $3, $4)', 
+                          [imdbId, date, date, tmdbRes.data]);
         
         res.setHeader('Content-Type', 'application/json');
         res.status(200).send(tmdbRes.data);
@@ -56,19 +57,19 @@ router.get('/details/:imdbId', validate(moviesSchema.validateImdbId), async (req
 router.get('/title/:imdbId', validate(moviesSchema.validateImdbId), async (req, res) => {
   let client;
   const imdbId = req.params.imdbId;
+
   try {
     client = await pool.connect();
     const { rows } = await pool.query('SELECT * From movies WHERE imdb_id = $1', [imdbId]);
-    let movie = rows[0];
 
+    let movie = rows[0];
     if (!movie) throw new Error(`The movie with the given IMDB ID ${imdbId} was not found.`);
     
     res.setHeader('Content-Type', 'application/json');
     res.status(200).send(movie);
   }
   catch(err) {
-    console.log(err)
-    res.status(404).send(err.message)
+    res.status(404).send(err.message);
   }
   finally {
     client.release();
@@ -84,7 +85,7 @@ router.get('/list', validate(moviesSchema.validatePage), async (req, res) => {
   let movieIdList = cache.get('movieList');
 
   if (pageNumber <= 0 || pageNumber > Math.round(movieIdList.length / 20)) {
-    res.status(404).send(`The page was not found.`)
+    res.status(404).send(`The page was not found.`);
     return;
   }
   
@@ -96,8 +97,8 @@ router.get('/list', validate(moviesSchema.validatePage), async (req, res) => {
   try {
     client = await pool.connect();
     const { rows } = await pool.query(`SELECT * from movies WHERE id in (${movieIdList})`);
+   
     let movie = rows[0];
-
     if (!movie) throw new Error(`Unable to fetch movies from DB.`);
 
     res.setHeader('Content-Type', 'application/json');
