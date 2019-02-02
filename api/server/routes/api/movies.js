@@ -1,17 +1,17 @@
 const config = require('config');
 const router = require('express').Router();
-const { schema } = require('../schema/movies');
+const { moviesSchema } = require('../schema/movies');
 const validate = require('express-validation');
 const { pool } = require('../../db');
 const axios = require('axios');
 const cache = require('memory-cache');
 
-router.param('imdbId', validate(schema.getMovie));
 
 /**
  * Get a movie detail
  */
-router.get('/details/:imdbId', async (req, res) => {
+router.get('/details/:imdbId', validate(moviesSchema.validateImdbId), async (req, res) => {
+  console.log('hello')
   let client; 
   const imdbId = req.params.imdbId;
   const apiKey = config.get('MovieDB.apiKey');
@@ -31,9 +31,9 @@ router.get('/details/:imdbId', async (req, res) => {
         res.setHeader('Content-Type', 'application/json');
         res.status(200).send(tmdbRes.data);
       } 
-      catch (err) {
-        const status = error.response.status;
-        const message = `The movie with the given IMDB ID ${imdbId} was not found: ${err}`;
+      catch(err) {
+        const status = err.response.status;
+        const message = `The movie with the given IMDB ID ${imdbId} was not found. The Movie DB responded with "${err}"`;
         
         res.status(status).send(message);
       }
@@ -43,7 +43,7 @@ router.get('/details/:imdbId', async (req, res) => {
     }
   } 
   catch(err) {
-    res.status(404).send(`The movie with the given IMDB ID ${imdbId} was not found: ${err}`);    
+    res.status(404).send(`The movie with the given IMDB ID ${imdbId} was not found.`);    
   }
   finally {
     client.release();
@@ -53,19 +53,22 @@ router.get('/details/:imdbId', async (req, res) => {
 /**
  * Get a movie
  */
-router.get('/:imdbId', async (req, res) => {
+router.get('/title/:imdbId', validate(moviesSchema.validateImdbId), async (req, res) => {
   let client;
   const imdbId = req.params.imdbId;
   try {
     client = await pool.connect();
     const { rows } = await pool.query('SELECT * From movies WHERE imdb_id = $1', [imdbId]);
     let movie = rows[0];
+
+    if (!movie) throw new Error(`The movie with the given IMDB ID ${imdbId} was not found.`);
     
     res.setHeader('Content-Type', 'application/json');
     res.status(200).send(movie);
   }
   catch(err) {
-    res.status(404).send(`The movie with the given IMDB ID ${imdbId} was not found: ${err}`)
+    console.log(err)
+    res.status(404).send(err.message)
   }
   finally {
     client.release();
@@ -75,8 +78,7 @@ router.get('/:imdbId', async (req, res) => {
 /**
  * Get movies by page number
  */
-// TODO: validation for query?
-router.get('/', async (req, res) => {
+router.get('/list', validate(moviesSchema.validatePage), async (req, res) => {
   let client;
   const pageNumber = parseInt(req.query.page);
   let movieIdList = cache.get('movieList');
@@ -94,12 +96,15 @@ router.get('/', async (req, res) => {
   try {
     client = await pool.connect();
     const { rows } = await pool.query(`SELECT * from movies WHERE id in (${movieIdList})`);
+    let movie = rows[0];
+
+    if (!movie) throw new Error(`Unable to fetch movies from DB.`);
 
     res.setHeader('Content-Type', 'application/json');
-    res.status(200).send(rows); // TODO: returns an array of movies, do we want that?
+    res.status(200).send(rows); 
   }
   catch(err) {
-    res.status(404).send(`The page was not found: ${err}`)
+    res.status(404).send(`The page was not found: ${err.message}`)
   }
   finally {
     client.release();
