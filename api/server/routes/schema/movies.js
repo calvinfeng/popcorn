@@ -1,12 +1,19 @@
 const Joi = require('joi');
-const imdbId = Joi.string().required();
+const imdbId = Joi.string().regex(/^tt[0-9]{7}/).required();
+const movieId = Joi.number().required();
+const page = Joi.number().integer().positive().required();
 
 const schema = {
-  getMovie: {
+  validateImdbId: {
     params: {
       imdbId: imdbId
+    }
+  },
+  validatePage: {
+    query: {
+      page: page
     }
   }
 };
 
-exports.schema = schema;
+exports.moviesSchema = schema;
