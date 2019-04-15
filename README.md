@@ -1,6 +1,7 @@
 # Popcorn
 
-Officially developing Popcorn 2.0.
+Popcorn 2.0 is currently **UNDER DEVELOPMENT**. Few architectural changes might take place. I am
+considering a Python Flask server for serving TF models.
 
 ## Architecture
 
