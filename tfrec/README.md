@@ -1,4 +1,4 @@
-# Model Server
+# TensorFlow Recommendation Service
 
 I want to serve Keras models with Python instead of Go because this will speed up development
 quite a bit. At least I don't have to learn the TF API in Go, there are too few tutorials on

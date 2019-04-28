@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const messages = require('../../pb/movie/movie_pb');
+const messages = require('../../protojs/recommendation_pb');
 
 router.get('/:email', (req, res) => {
   const cli = res.locals.grpc_client;

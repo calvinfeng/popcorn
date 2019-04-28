@@ -1,4 +1,4 @@
-const services = require('../pb/movie/movie_grpc_pb');
+const services = require('../protojs/recommendation_grpc_pb');
 const grpc = require('grpc');
 
 function newGRPCMiddleware() {

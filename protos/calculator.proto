@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+option go_package = "protogo";
+
+// Calculator is a dummy server that tests the implementation of gRPC server in Python.
+service Caculator {
+    rpc Add(Input) returns (Output);
+}
+
+message Input {
+    int64 left = 1;
+    int64 right = 2;
+}
+
+message Output {
+    int64 value = 1;
+}

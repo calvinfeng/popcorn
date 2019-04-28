@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"popcorn/recommender/lowrank"
 	"popcorn/recommender/model"
-	"popcorn/recommender/pb/movie"
+	"popcorn/recommender/protogo"
 
 	"github.com/sirupsen/logrus"
 )
@@ -14,7 +14,7 @@ import (
 type Server struct{}
 
 // Fetch returns a list of recommended movies.
-func (srv *Server) Fetch(ctx context.Context, req *movie.RecommendRequest) (*movie.RecommendResponse, error) {
+func (srv *Server) Fetch(ctx context.Context, req *protogo.RecommendRequest) (*protogo.RecommendResponse, error) {
 	logrus.Infof("server received request to fetch movie for user %s", req.UserEmail)
 
 	ratings, err := model.FetchUserRatings(req.UserEmail)
@@ -61,20 +61,20 @@ func (srv *Server) Fetch(ctx context.Context, req *movie.RecommendRequest) (*mov
 		return nil, err
 	}
 
-	protoMovies := []*movie.Movie{}
+	protoMovies := []*protogo.Movie{}
 	for _, m := range movies {
-		protoMovies = append(protoMovies, &movie.Movie{
+		protoMovies = append(protoMovies, &protogo.Movie{
 			Id:     int64(m.ID),
 			Title:  m.Title,
 			ImdbId: m.IMDBID,
 		})
 	}
 
-	return &movie.RecommendResponse{Movies: protoMovies}, nil
+	return &protogo.RecommendResponse{Movies: protoMovies}, nil
 }
 
 // UpdateUserPreference queues a training task.
-func (srv *Server) UpdateUserPreference(ctx context.Context, req *movie.UpdateRequest) (*movie.UpdateResponse, error) {
+func (srv *Server) UpdateUserPreference(ctx context.Context, req *protogo.UpdateRequest) (*protogo.UpdateResponse, error) {
 	var latent []float64
 
 	pref, err := model.FetchUserPreference(req.UserEmail)
@@ -104,7 +104,7 @@ func (srv *Server) UpdateUserPreference(ctx context.Context, req *movie.UpdateRe
 
 	go handleResponse(req.UserEmail, ch)
 
-	return &movie.UpdateResponse{Accepted: true}, nil
+	return &protogo.UpdateResponse{Accepted: true}, nil
 }
 
 func handleResponse(email string, ch <-chan lowrank.TrainerResponse) {
