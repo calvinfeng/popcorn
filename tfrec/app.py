@@ -1,8 +1,22 @@
-from flask import Flask, jsonify, render_template
-from flask import request
-from keras.applications.resnet50 import ResNet50, preprocess_input, decode_predictions
+from flask import (
+    Flask, jsonify, render_template, request
+)
+
+from concurrent import futures
+
+from keras.applications.resnet50 import (
+    ResNet50, preprocess_input, decode_predictions
+)
+
+from calculator_pb2_grpc import (
+    CaculatorServicer, add_CaculatorServicer_to_server
+)
+
+from calculator_pb2 import Output
+
 import numpy as np
 import cv2
+import grpc
 
 
 app = Flask(__name__)
@@ -38,10 +52,23 @@ def classify():
     for pred in preds:
         classes.append(pred[1])
 
-    resp = jsonify({ 'classes': classes })
+    resp = jsonify({'classes': classes})
     resp.status_code = 200
     return resp
 
 
+class Calculator(CaculatorServicer):
+    def Add(self, input, context):
+        output = Output()
+        output.value = input.left + input.right
+        return output
+
+
 if __name__ == '__main__':
+    grpc_srv = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
+    add_CaculatorServicer_to_server(Calculator(), grpc_srv)
+    grpc_srv.add_insecure_port('[::]:8081')
+
+    print('starting gRPC server on port 8081 and Flask server on port 8080')
+    grpc_srv.start()
     app.run(debug=False, threaded=False, port=8080)
