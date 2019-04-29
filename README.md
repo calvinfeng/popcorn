@@ -5,13 +5,14 @@ considering a Python Flask server for serving TF models.
 
 ## Architecture
 
-Docker, Golang, TypeScript, Node.js, PostgreSQL, gRPC
+Docker, Golang, TypeScript, Python 3, Node.js, PostgreSQL, gRPC
 
 ### Requirements
 
 - Golang 1.11+
 - Node 10+
 - Docker
+- Python 3.6+
 
 ## Local Development Guide
 
@@ -33,6 +34,10 @@ and JavaScript.
 ### Recommender
 
 [README](./recommender/README.md)
+
+### Tensorflow Recommender
+
+[README](./tfrec/README.md)
 
 ## Deployment Guide
 
